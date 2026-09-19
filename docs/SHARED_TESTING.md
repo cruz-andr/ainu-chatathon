@@ -114,7 +114,12 @@ the hosted UI or the local development proxy instead.
 
 - One shared job runs at a time; at most five active/queued jobs total and two per
   teammate. Both planning and analysis use the same serialized queue.
-- Per teammate: 20 jobs/hour, 20 AI invocations/day, 60 patent requests/day.
+- `GET /api/research/:id/brief.{md,tex,pdf}` exports a report you own. The
+  gateway renders these itself; it does not proxy the local API. `brief.pdf`
+  needs `pdflatex` on the host serving the gateway and returns 503
+  `PDF_NOT_CONFIGURED` without it, leaving the LaTeX download available.
+- Per teammate: 20 jobs/hour, 20 AI invocations/day, 60 patent requests/day,
+  2 PDF typesetting requests/minute, one at a time.
 - All teammates combined: 60 AI invocations/day, 120 patent requests/day.
 - Limits reserve worst-case calls before work starts and do not refund failures.
   Day/hour boundaries are UTC. These are call-count caps, not exact dollar caps;

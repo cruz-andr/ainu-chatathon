@@ -18,7 +18,11 @@ const assets = new Map([
   ...['api', 'app', 'render', 'login'].map((name) => [`/src/${name}.js`, [`src/${name}.js`, 'text/javascript']]),
 ]);
 
-export function createGateway({ access, provider, ai, publicOrigin = '', proxyKey = '', now = Date.now }) {
+// Both pdflatex passes have to finish inside server.requestTimeout below, so
+// the per-pass bound here is tighter than the one the local API uses.
+const defaultRenderPdf = (latex) => toPdf(latex, { timeoutMs: 6_000 });
+
+export function createGateway({ access, provider, ai, publicOrigin = '', proxyKey = '', now = Date.now, renderPdf = defaultRenderPdf }) {
   if (proxyKey && !/^[a-f0-9]{64}$/.test(proxyKey)) throw new Error('Invalid private proxy key.');
   let pdfBusy = false;
   if (publicOrigin && (!/^https:\/\/[a-zA-Z0-9.-]+(?::\d+)?$/.test(publicOrigin))) throw new Error('PUBLIC_ORIGIN must be an exact HTTPS origin with no path.');
@@ -113,14 +117,17 @@ export function createGateway({ access, provider, ai, publicOrigin = '', proxyKe
         if (!report) throw new ApiError(404, 'REPORT_NOT_FOUND', 'Report not found or expired.');
         if (!reportMatch[2]) send(200, report);
         else if (reportMatch[2] === 'pdf') {
+          // Typesetting spawns a process, so it gets a far smaller budget than
+          // the general per-minute allowance, and only one runs at a time.
           throttle(`pdf:${user.id}`, 2);
           if (pdfBusy) throw new ApiError(429, 'PDF_BUSY', 'A PDF is being prepared. Try again shortly.');
           pdfBusy = true;
           try {
-            const pdf = await toPdf(toLatex(report), { timeoutMs: 10000 });
+            const pdf = await renderPdf(toLatex(report));
             res.writeHead(200, { 'Content-Type': 'application/pdf', 'Content-Disposition': `attachment; filename="patent-research-${report.id}.pdf"` }); res.end(pdf);
           } finally { pdfBusy = false; }
         } else {
+          // Each export escapes source text for its own format; none is HTML.
           const tex = reportMatch[2] === 'tex';
           res.writeHead(200, { 'Content-Type': `${tex ? 'application/x-tex' : 'text/markdown'}; charset=utf-8`, 'Content-Disposition': `attachment; filename="patent-research-${report.id}.${reportMatch[2]}"` });
           res.end(tex ? toLatex(report) : toMarkdown(report));

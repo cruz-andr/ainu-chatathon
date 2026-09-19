@@ -8,6 +8,7 @@ import { tmpdir } from 'node:os';
 import { AccessStore } from '../sharing/access.js';
 import { Jobs } from '../sharing/jobs.js';
 import { createGateway } from '../sharing/gateway.js';
+import { ApiError } from '../errors.js';
 
 const input = { idea: 'A fictional container with a soil moisture sensor.', features: ['soil moisture sensor'],
   queries: ['soil moisture container'], country: 'US', maxResults: 3, allowExternalSearch: true };
@@ -173,4 +174,54 @@ test('login throttling rejects repeated guesses without trusting spoofed IP head
   assert.equal(response.status, 429);
   assert.equal(response.headers.get('retry-after'), '60');
   assert.equal(calls(), 0);
+});
+
+// The gateway renders briefs itself rather than proxying the local API, so
+// every export the report page links to has to exist here too.
+test('shared briefs download as LaTeX and PDF under the same ownership and budget rules', async (t) => {
+  const rendered = [];
+  const { request, a, b } = await setup(t, {
+    renderPdf: async (latex) => { rendered.push(latex); return Buffer.from('%PDF-1.5 stub\n'); },
+  });
+  const { jobId } = await request('/api/research', { token: a.token, body: input }).then((r) => r.json());
+  await tick();
+  const id = (await request(`/api/jobs/${jobId}`, { token: a.token }).then((r) => r.json())).result.id;
+
+  const tex = await request(`/api/research/${id}/brief.tex`, { token: a.token });
+  assert.equal(tex.status, 200);
+  assert.equal(tex.headers.get('content-type'), 'application/x-tex; charset=utf-8');
+  assert.match(tex.headers.get('content-disposition'), /attachment; filename="patent-research-.+\.tex"/);
+  assert.match(await tex.text(), /\\documentclass/);
+
+  const pdf = await request(`/api/research/${id}/brief.pdf`, { token: a.token });
+  assert.equal(pdf.status, 200);
+  assert.equal(pdf.headers.get('content-type'), 'application/pdf');
+  assert.match(pdf.headers.get('content-disposition'), /attachment; filename="patent-research-.+\.pdf"/);
+  assert.equal(Buffer.from(await pdf.arrayBuffer()).subarray(0, 5).toString(), '%PDF-');
+  assert.equal(rendered.length, 1);
+
+  // A second teammate cannot reach either export for a report they do not own.
+  assert.equal((await request(`/api/research/${id}/brief.tex`, { token: b.token })).status, 404);
+  assert.equal((await request(`/api/research/${id}/brief.pdf`, { token: b.token })).status, 404);
+  assert.equal(rendered.length, 1, 'a non-owner must never trigger typesetting');
+});
+
+test('PDF requests are throttled well below the general budget and report an absent pdflatex', async (t) => {
+  const { request, a } = await setup(t, {
+    renderPdf: async () => { throw new ApiError(503, 'PDF_NOT_CONFIGURED', 'pdflatex is not installed on the server. Download the LaTeX source instead.'); },
+  });
+  const { jobId } = await request('/api/research', { token: a.token, body: input }).then((r) => r.json());
+  await tick();
+  const id = (await request(`/api/jobs/${jobId}`, { token: a.token }).then((r) => r.json())).result.id;
+
+  const missing = await request(`/api/research/${id}/brief.pdf`, { token: a.token });
+  assert.equal(missing.status, 503);
+  assert.equal((await missing.json()).error.code, 'PDF_NOT_CONFIGURED');
+  // The LaTeX download stays available when typesetting is not.
+  assert.equal((await request(`/api/research/${id}/brief.tex`, { token: a.token })).status, 200);
+
+  assert.equal((await request(`/api/research/${id}/brief.pdf`, { token: a.token })).status, 503);
+  const throttled = await request(`/api/research/${id}/brief.pdf`, { token: a.token });
+  assert.equal(throttled.status, 429);
+  assert.equal((await throttled.json()).error.code, 'RATE_LIMIT');
 });

@@ -1,10 +1,11 @@
 import { createServer } from 'node:http';
 import { ApiError } from './errors.js';
 import { validateResearch, validatePlanRequest } from './validation.js';
-import { research, ReportStore } from './research.js';
+import { ReportStore } from './research.js';
+import { runResearch } from './run-research.js';
 import { toMarkdown } from './brief.js';
 
-async function readJson(req) {
+export async function readJson(req) {
   if (req.headers['content-type']?.split(';')[0].trim() !== 'application/json') {
     throw new ApiError(415, 'JSON_REQUIRED', 'Use Content-Type: application/json.');
   }
@@ -53,23 +54,8 @@ export function createApp({ provider, ai, store = new ReportStore(), frontendOri
         if (input.analyze && !ai?.configured) throw new ApiError(503, 'AI_NOT_CONFIGURED', 'Configure the Mac mini Codex worker or disable analysis.');
         if (activeResearch >= 2) throw new ApiError(429, 'BUSY', 'Two research requests are already running. Try again shortly.');
         activeResearch++;
-        const started = Date.now();
         try {
-          const report = await research(input, provider);
-          if (input.analyze && report.patents.length) {
-            try { report.analysis = await ai.compare(report); }
-            catch (error) {
-              report.analysis = { status: 'unavailable', comparisons: [], message: 'AI comparison failed; retrieved patent evidence remains available.',
-                errorCode: error instanceof ApiError ? error.code : 'AI_FAILED' };
-              report.status = 'partial';
-              report.warnings.push(report.analysis.message);
-            }
-          } else if (input.analyze) {
-            report.analysis = { status: 'no_evidence', comparisons: [], message: 'No patent records are available for AI comparison.' };
-          } else {
-            report.analysis = { status: 'not_requested', comparisons: [], message: 'AI comparison was not requested. These are retrieved source records.' };
-          }
-          report.elapsedMs = Date.now() - started;
+          const report = await runResearch(input, provider, ai);
           store.put(report);
           send(201, report);
         } finally { activeResearch--; }

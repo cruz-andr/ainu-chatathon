@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Prior Art — teammate sign-in</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <h1>Teammate access</h1>
+      <p>Use the private access code from your host. No SSH or Tailscale setup is needed.</p>
+      <form id="login-form" class="ask">
+        <label for="access-code">Access code</label>
+        <input id="access-code" type="password" autocomplete="off" maxlength="100" required>
+        <button class="button" type="submit">Connect</button>
+      </form>
+      <p id="login-error" role="alert"></p>
+      <p class="fineprint">Invite-only demo. Use fictional or non-confidential ideas. Requests travel through Cloudflare to the host, then to the patent and model providers with your consent. Reports expire after one hour or when the host restarts. Access and usage metadata are stored locally.</p>
+    </section>
+  </main>
+  <script type="module" src="/src/login.js"></script>
+</body>
+</html>

@@ -59,8 +59,10 @@ If a change would require softening one of these, stop and raise it instead.
 - Never log, persist, or return invention text or upstream URLs. The SerpApi URL
   contains the API key; Codex stderr can contain source text.
 - Never commit credentials, and never copy Codex login tokens off the Mac mini.
-- The backend stays bound to loopback. It has no authentication, no database, and
-  no rate limiting. Do not expose it publicly without all three.
+- Both servers stay bound to loopback. The local API on port 3001 has no access
+  controls and must never be tunneled. Only the shared gateway on port 3002 may
+  be tunneled: it enforces authentication, SQLite-backed budgets, request limits,
+  per-user report ownership and a serialized job queue. See docs/SHARED_TESTING.md.
 
 ## Frontend rules
 
@@ -76,8 +78,9 @@ framework. Keep it that way — it has to survive a live demo on a laptop.
   A failed request must never render as a clean search.
 - Get explicit consent before sending queries to the search provider and before
   sending the idea and evidence to the model provider. Both are separate choices.
-- Research is synchronous and can take up to three minutes. There is no streaming
-  or jobs endpoint. Show progress; do not add a fake one.
+- The local API is synchronous. The shared gateway returns 202 with a job ID;
+  poll its authenticated /api/jobs/:id endpoint for completion. Queueing may add
+  several minutes. Show elapsed time, not invented pipeline stages or percentages.
 - Any fixture or canned report must be visibly labelled as a demo. Never add a
   silent simulated fallback to a live endpoint.
 

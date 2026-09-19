@@ -41,6 +41,8 @@ const HINTS = {
   AI_UNAVAILABLE: 'The Mac mini could not be reached, or the request timed out.',
   SEARCH_PROVIDER_UNAVAILABLE: 'The patent provider did not respond in time. Running it again usually works.',
   NETWORK: 'Start the API with "npm start" in the project root, then try again.',
+  QUEUE_FULL: 'The shared worker has a bounded queue. Wait for a current job to finish.',
+  USAGE_LIMIT: 'The host has set a daily demo budget. Ask them before running more searches.',
 };
 
 // --- editable plan -----------------------------------------------------------
@@ -164,20 +166,15 @@ async function startPlan(event) {
 let timer = null;
 
 function startProgress() {
-  const stages = [
-    'Searching published patents…',
-    'Pulling the full text of the closest records…',
-    'Reading the claims against your idea…',
-    'Still working. Deep searches can take up to three minutes…',
-  ];
   const started = Date.now();
   const stage = $('progress-stage');
   const clock = $('progress-clock');
-  stage.textContent = stages[0];
+  stage.textContent = 'Queued or processing your patent research…';
+  clock.textContent = '0s elapsed';
   timer = setInterval(() => {
     const seconds = Math.round((Date.now() - started) / 1000);
     clock.textContent = `${seconds}s elapsed`;
-    stage.textContent = stages[Math.min(Math.floor(seconds / 25), stages.length - 1)];
+    if (seconds >= 180) stage.textContent = 'Still waiting for the shared worker. Keep this page open.';
   }, 1000);
 }
 

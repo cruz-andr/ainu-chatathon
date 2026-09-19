@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prior Art — see what's already patented before you build it</title>
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+
+<header class="masthead">
+  <p class="wordmark">Prior Art</p>
+  <p class="kicker">AINU Chatathon 2026 · Misneach</p>
+</header>
+
+<main>
+
+  <!-- 1. the prompt box -->
+  <section id="step-idea" class="hero">
+    <h1>See what's already patented<br>before you build it.</h1>
+    <p class="standfirst">
+      Describe your idea the way you'd explain it to a friend. Get back the actual
+      patent numbers sitting closest to it, the exact claim text that overlaps, and
+      a few honest directions worth exploring instead.
+    </p>
+
+    <form id="form-idea" class="ask">
+      <label for="idea">What are you building?</label>
+      <textarea id="idea" name="idea" rows="5" maxlength="5000" required
+        placeholder="A plant container that measures soil moisture and opens a valve to water the plant automatically."></textarea>
+      <div class="examples">
+        <span class="meta">Try one:</span>
+        <button type="button" class="link" data-example="A plant container that measures soil moisture with a capacitive sensor and opens a small valve to water the plant automatically.">self-watering planter</button>
+        <button type="button" class="link" data-example="A wrist-worn band that estimates blood oxygen from reflected green and red light and warns the wearer when readings drop overnight.">wearable sensor</button>
+        <button type="button" class="link" data-example="A bike lock that unlocks over Bluetooth and stiffens its shackle using a shape-memory alloy when it detects cutting vibration.">smart bike lock</button>
+      </div>
+      <button type="submit" id="plan-submit" class="button">Find what already exists</button>
+      <p class="fineprint">
+        Your description is sent to a model provider to draft the search. Use a
+        fictional or non-confidential idea for this demo — a search query can itself
+        disclose an invention.
+      </p>
+    </form>
+  </section>
+
+  <div id="error" class="error" role="alert" hidden></div>
+
+  <!-- 2. confirm the search -->
+  <section id="step-plan" hidden>
+    <h2>Check the search before it runs</h2>
+    <p class="lead">
+      This is what the search is about to look for. Edit anything that's wrong —
+      you know your invention better than the model does.
+    </p>
+    <blockquote id="plan-idea" class="restate"></blockquote>
+
+    <form id="form-plan">
+      <fieldset>
+        <legend>The features being compared</legend>
+        <div id="features" class="chips"></div>
+        <div class="row">
+          <input type="text" id="feature-input" maxlength="300" placeholder="Add a feature">
+          <button type="button" id="feature-add" class="button small">Add</button>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>The searches being run</legend>
+        <div id="queries"></div>
+        <button type="button" id="query-add" class="button small">Add a search</button>
+      </fieldset>
+
+      <div id="plan-questions" hidden>
+        <p class="label">The model wasn't sure about these</p>
+        <ul id="plan-questions-list" class="bullets"></ul>
+        <p class="meta">Answering these in your description usually sharpens the results.</p>
+      </div>
+
+      <fieldset class="row">
+        <label for="country">Where published
+          <select id="country">
+            <option value="US" selected>United States</option>
+            <option value="EP">Europe</option>
+            <option value="WO">WIPO / international</option>
+            <option value="GB">United Kingdom</option>
+            <option value="CA">Canada</option>
+            <option value="AU">Australia</option>
+            <option value="JP">Japan</option>
+            <option value="CN">China</option>
+            <option value="KR">South Korea</option>
+            <option value="DE">Germany</option>
+            <option value="FR">France</option>
+          </select>
+        </label>
+        <label for="max-results">Records to return
+          <select id="max-results">
+            <option value="3">3</option>
+            <option value="5" selected>5</option>
+            <option value="10">10</option>
+          </select>
+        </label>
+      </fieldset>
+
+      <label class="consent">
+        <input type="checkbox" id="consent-search">
+        Send these searches to the patent search provider.
+      </label>
+      <label class="consent">
+        <input type="checkbox" id="consent-ai" checked>
+        <span>Also send my idea and the retrieved patent text to the model provider to compare them.
+          <span id="ai-consent-note" class="meta" hidden>Needs at least one feature above to compare against.</span>
+        </span>
+      </label>
+
+      <div class="row">
+        <button type="submit" id="plan-submit-run" class="button" disabled>Run the search</button>
+        <button type="button" id="plan-back" class="button ghost">Start over</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- 3. waiting -->
+  <section id="step-running" class="running" hidden>
+    <div class="pulse" aria-hidden="true"></div>
+    <p id="progress-stage" class="progress-stage">Searching published patents…</p>
+    <p id="progress-clock" class="meta">0s elapsed</p>
+    <p class="meta">Real searches against real records. Leave this open.</p>
+  </section>
+
+  <!-- 4. the report -->
+  <section id="step-report" hidden>
+    <div id="report"></div>
+    <button type="button" id="report-restart" class="button ghost">Research another idea</button>
+  </section>
+
+  <!-- the pitch -->
+  <section class="pitch">
+    <div class="pitch-item">
+      <p class="label">Who it's for</p>
+      <h3>The first-time product founder.</h3>
+      <p>
+        You're building something physical or technical. There's no research
+        specialist on the team, no patent budget yet, and a real chance that some
+        part of your idea is already sitting in a filing cabinet in Alexandria,
+        Virginia. You have no practical way to find out.
+      </p>
+    </div>
+
+    <div class="pitch-item">
+      <p class="label">The bottleneck</p>
+      <h3>Turning a description into a shortlist.</h3>
+      <p>
+        Patent search punishes newcomers. The records are indexed by classification
+        codes you've never seen, described in vocabulary chosen by attorneys to be
+        broad rather than clear, and split between granted patents and pending
+        applications that mean very different things. So founders do one of two
+        things: skip the search and build blind, or stall for weeks reading
+        documents they can't interpret.
+      </p>
+    </div>
+
+    <div class="pitch-item">
+      <p class="label">What you get</p>
+      <h3>Evidence, not opinions.</h3>
+      <p>
+        Publication numbers you can look up yourself. The exact sentences from each
+        patent that touch your idea, quoted rather than paraphrased. Alternative
+        technical routes prompted by what those patents actually claim. And a list
+        of questions written against your specifics, ready for a professional.
+      </p>
+    </div>
+
+    <div class="pitch-item">
+      <p class="label">The savings</p>
+      <h3>Minutes instead of an afternoon.</h3>
+      <p>
+        A run finishes in under three minutes. Assembling the same sourced shortlist
+        by hand is an afternoon at best and a week at worst, and most founders never
+        finish it. The bigger prize is the first attorney meeting: walk in with
+        numbered records and specific questions and that hour goes to answers
+        instead of orientation. We measure time-to-brief, source accuracy, and
+        search cost. Legal-fee savings are the hypothesis we're testing, not a
+        number we're claiming.
+      </p>
+    </div>
+
+    <div class="pitch-item wide">
+      <p class="label">Why it holds up</p>
+      <h3>It refuses to tell you what it can't know.</h3>
+      <p>
+        Every comparison has to quote the patent word for word, and the quote is
+        checked character by character against the retrieved record before it
+        reaches you — a model can't invent a patent number or a claim here and have
+        it survive. Coverage limits are printed on the report rather than buried.
+        And the tool will not tell you that something is novel, patentable,
+        non-infringing, or safe to build, because a search cannot establish any of
+        those things. Empty results mean these keywords found nothing. Nothing more.
+        The judgment stays with a registered patent attorney; this gets you to that
+        conversation prepared.
+      </p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <p>
+    Research assistance only. Not legal advice, and not a patentability, novelty,
+    infringement, or freedom-to-operate opinion.
+  </p>
+</footer>
+
+<script type="module" src="./src/app.js"></script>
+</body>
+</html>

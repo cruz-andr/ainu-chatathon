@@ -3,11 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "node --env-file-if-exists=.env --watch backend/server.js",
     "start": "node --env-file-if-exists=.env backend/server.js",
     "test": "node --test backend/test/*.test.js",
-    "check:codex": "node --env-file-if-exists=.env scripts/check-codex.js"
+    "check:codex": "node --env-file-if-exists=.env scripts/check-codex.js",
+    "frontend": "node scripts/serve-frontend.js"
   }
 }

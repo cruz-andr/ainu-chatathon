@@ -30,8 +30,8 @@ The earlier WHOOP beacon and hardware concepts are out of the current scope.
 - `npm test`: isolated unit and HTTP tests; no live model or patent calls.
 - `npm run check:codex`: opt-in real Codex check using artificial test data. Uses
   the configured account; it is not a live patent-retrieval test.
-- Frontend is not implemented in this commit. Default allowed browser origin:
-  `http://localhost:5173` (change `FRONTEND_ORIGIN` if needed).
+- `npm run frontend`: zero-dependency static frontend on `http://localhost:5173`,
+  matching the default allowed browser origin (change `FRONTEND_ORIGIN` if needed).
 
 Read README.md for the full API contract. Key files:
 
@@ -43,6 +43,9 @@ Read README.md for the full API contract. Key files:
 | `backend/providers/codex-cli.js` | Headless Codex via SSH; planning, comparison, alternatives, citation validation |
 | `backend/research.js` | Search aggregation, deduplication, coverage, ephemeral report store |
 | `backend/brief.js` | Markdown report export |
+| `frontend/src/app.js` | Flow: idea, reviewed plan, search, report |
+| `frontend/src/render.js` | Report rendering and the `textContent` escaping boundary |
+| `frontend/src/api.js` | API client; field names mirror the README |
 
 ## Frontend integration sequence
 

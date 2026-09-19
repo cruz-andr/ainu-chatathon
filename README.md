@@ -36,6 +36,31 @@ npm run dev
 npm test
 ```
 
+## Frontend
+
+`frontend/` is a zero-dependency static app: ES modules, no build step, no
+framework, nothing to install. Serve it alongside the API:
+
+```sh
+npm run frontend
+```
+
+It listens on `http://localhost:5173`, matching the default `FRONTEND_ORIGIN`.
+Run `npm start` in a second shell so the API is up.
+
+The flow is idea → reviewed search plan → confirmed search → report, matching the
+integration sequence in `CLAUDE.md`. Consent for the search provider and for the
+model provider are separate checkboxes; AI comparison is offered only when at
+least one feature is present, because the backend requires one. If `/api/plan`
+returns `AI_NOT_CONFIGURED`, the founder can still write queries by hand and run
+the search without analysis.
+
+The report leads with publication numbers linked to their source records, then
+shows quoted comparisons, proposed alternatives, questions for a professional,
+and the coverage limits. All API, model, and patent text is written with
+`textContent`; nothing from a provider reaches `innerHTML`. See `SKILLS.md` for
+the rules that apply to changes in this directory.
+
 ## Frontend contract
 
 | Method | Path | Purpose |

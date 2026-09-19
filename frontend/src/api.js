@@ -70,3 +70,25 @@ export const research = ({ idea, features, queries, country, maxResults, analyze
   });
 
 export const briefUrl = (id, format = 'md') => `${API_BASE}/api/research/${id}/brief.${format}`;
+
+// Exports are plain text or binary, so they bypass call()'s JSON handling. A
+// failed export must reach the page as a message; following the link instead
+// would drop the founder on a blank tab holding a raw error body.
+export async function fetchBrief(id, format) {
+  let response;
+  try {
+    response = await fetch(briefUrl(id, format));
+  } catch {
+    throw new ApiFailure('NETWORK', `Could not reach the research API at ${API_BASE}.`, 0);
+  }
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    if (response.status === 401 && !localBridge && API_BASE === window.location.origin) window.location.assign('/login.html');
+    throw new ApiFailure(
+      body?.error?.code ?? 'UNKNOWN',
+      body?.error?.message ?? `The export failed with HTTP ${response.status}.`,
+      response.status,
+    );
+  }
+  return response.blob();
+}

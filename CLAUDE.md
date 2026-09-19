@@ -32,6 +32,9 @@ The earlier WHOOP beacon and hardware concepts are out of the current scope.
   the configured account; it is not a live patent-retrieval test.
 - `npm run frontend`: zero-dependency static frontend on `http://localhost:5173`,
   matching the default allowed browser origin (change `FRONTEND_ORIGIN` if needed).
+- `npm run share`: authenticated shared gateway on `http://127.0.0.1:3002`.
+- `npm run team:access`: issue and revoke teammate access codes.
+- `npm run frontend:shared`: local development proxy against the gateway.
 
 Read README.md for the full API contract. Key files:
 
@@ -45,6 +48,9 @@ Read README.md for the full API contract. Key files:
 | `backend/brief.js` | Markdown report export |
 | `backend/latex.js` | LaTeX briefing export; escapes TeX control characters |
 | `backend/pdf.js` | Typesets the LaTeX with pdflatex; shell escape and file access disabled |
+| `backend/sharing/gateway.js` | Authenticated shared server: sessions, budgets, job queue, exports |
+| `backend/sharing/access.js` | SQLite-backed teammate access codes and usage limits |
+| `backend/sharing/jobs.js` | Serialized job queue with per-user report ownership |
 | `frontend/src/app.js` | Flow: idea, reviewed plan, search, report |
 | `frontend/src/render.js` | Report rendering and the `textContent` escaping boundary |
 | `frontend/src/api.js` | API client; field names mirror the README |
@@ -78,8 +84,10 @@ Read README.md for the full API contract. Key files:
    `PDF_NOT_CONFIGURED` when pdflatex is absent.
 
 Use a loading state for the synchronous research request (allow up to three
-minutes). There is no streaming/progress/jobs endpoint. `GET /api/health` says
-whether search/AI are configured, not whether credentials are valid.
+minutes). The local API has no streaming or jobs endpoint; the shared gateway
+returns 202 with a job ID to poll at `GET /api/jobs/:id`, and the API client
+handles both. `GET /api/health` says whether search/AI are configured, not
+whether credentials are valid.
 
 Handle `partial`, `no_matches`, and unsuccessful HTTP responses separately.
 Do not present missing evidence or failed requests as a clean search.
@@ -110,15 +118,18 @@ login tokens. The patent source is currently SerpApi's `google_patents` search a
 
 The AI runs through Codex CLI on the owner's Mac mini using an existing ChatGPT
 login. The Mac mini hosts the CLI; inference still uses the model provider.
-Set `CODEX_SSH_TARGET` and absolute `CODEX_BINARY` privately. Teammates need an
-authorized SSH route or should run the backend on a machine that already has it.
+Set `CODEX_MODE` (`ssh` or `local`), `CODEX_SSH_TARGET` for ssh mode, and an
+absolute `CODEX_BINARY`, privately. Teammates need an authorized SSH route or
+should run the backend on a machine that already has Codex, which is what
+`CODEX_MODE=local` on the Mac mini does for the shared demo.
 Don't assume the Mac mini is reachable from every teammate's laptop.
 Don't change SSH trust settings or disable sandbox controls to get it working.
 
 AI calls are ephemeral, use read-only sandboxing, ignore user configuration, and
 disable shell, browser, app/plugin, and delegation capabilities. One AI request
-runs at a time; overlap returns AI_BUSY. There is no queue. Each AI call times out
-after 120 seconds. Search calls time out after 20 seconds.
+runs at a time; overlap returns AI_BUSY on the local API, while the shared
+gateway serializes requests in a job queue. Each AI call times out after 120
+seconds. Search calls time out after 20 seconds.
 
 Search makes at most three first-page requests (ten records each) plus details
 for the first three unique returned records. Cross-query deduplication is by
@@ -126,15 +137,18 @@ publication number, not full patent family. AI gets only three records, twelve
 passages each, at most 3000 characters per passage; surface these coverage limits.
 
 Reports live in RAM, expire after one hour, cap at 100, and disappear on restart.
-The server is a local hackathon prototype with no accounts/database. Don't expose
-it publicly without authentication, access controls, and spending limits.
+The local API on port 3001 has no accounts or database and must never be
+tunneled. The shared gateway on port 3002 is the one that may be, and it carries
+the authentication, budgets, and access controls; see `docs/SHARED_TESTING.md`.
 
 ## Collaboration
 
-Verified at handoff: all 18 automated tests passed. A real Mac mini Codex check
-completed query planning, two comparisons, and one proposed alternative, with
-citations validated against artificial evidence. Live patent retrieval has not
-been tested; the local patent API key is still unset.
+Verified: all 55 automated tests pass. Live patent retrieval was confirmed on
+2026-09-19 — one real SerpApi request with a fictional idea returned five
+records in 2.7s, with details for the first three, and all three exports were
+produced from that report. The Mac mini Codex worker has not been exercised
+from this checkout, so comparisons and alternatives are still untested against
+real provider text.
 
 Preserve the agreed API field names so frontend work can proceed independently.
 Keep backend changes in `backend/`; a frontend teammate can own `frontend/`.

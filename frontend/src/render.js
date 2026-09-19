@@ -1,7 +1,7 @@
 // Report rendering. Every value from the API, the model, or a patent record is
 // written with textContent. Never assign provider text to innerHTML.
 
-import { briefUrl } from './api.js';
+import { briefUrl, fetchBrief } from './api.js';
 
 const el = (tag, className, text) => {
   const node = document.createElement(tag);
@@ -230,16 +230,46 @@ export function renderReport(report, mount) {
   head.append(badges, el('p', 'notice', STATUS_NOTE[report.status] ?? ''));
 
   const downloads = el('p', 'downloads');
-  const latex = el('a', 'button', 'Download the briefing (LaTeX)');
-  latex.href = briefUrl(report.id, 'tex');
-  const pdf = el('a', 'button ghost', 'View as PDF');
-  pdf.href = briefUrl(report.id, 'pdf');
-  pdf.target = '_blank';
-  pdf.rel = 'noopener noreferrer';
-  const markdown = el('a', 'button ghost', 'Markdown');
-  markdown.href = briefUrl(report.id, 'md');
-  downloads.append(latex, pdf, markdown);
-  head.append(downloads);
+  const exportNote = el('p', 'warn');
+  exportNote.hidden = true;
+
+  // Typesetting can be unavailable and a report expires after an hour, so each
+  // export is fetched and its failure reported here rather than followed.
+  const exportButton = (format, label, className) => {
+    const node = el('a', className, label);
+    node.href = briefUrl(report.id, format);
+    node.addEventListener('click', async (event) => {
+      event.preventDefault();
+      if (node.dataset.busy) return;
+      node.dataset.busy = 'true';
+      node.textContent = format === 'pdf' ? 'Typesetting…' : 'Preparing…';
+      exportNote.hidden = true;
+      try {
+        const url = URL.createObjectURL(await fetchBrief(report.id, format));
+        const save = el('a');
+        save.href = url;
+        save.download = `patent-research-${report.id}.${format}`;
+        save.click();
+        setTimeout(() => URL.revokeObjectURL(url), 10_000);
+      } catch (error) {
+        exportNote.textContent = error.code === 'PDF_NOT_CONFIGURED'
+          ? `${error.message} The briefing itself is unaffected; the LaTeX download holds the same content.`
+          : `The ${format.toUpperCase()} export failed: ${error.message}`;
+        exportNote.hidden = false;
+      } finally {
+        node.textContent = label;
+        delete node.dataset.busy;
+      }
+    });
+    return node;
+  };
+
+  downloads.append(
+    exportButton('tex', 'Download the briefing (LaTeX)', 'button'),
+    exportButton('pdf', 'Download the PDF', 'button ghost'),
+    exportButton('md', 'Markdown', 'button ghost'),
+  );
+  head.append(downloads, exportNote);
   head.append(el('p', 'meta', 'The LaTeX source is the version to take to a patent professional. The PDF is typeset from it on the server and needs pdflatex installed.'));
   mount.append(head);
 

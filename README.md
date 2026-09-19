@@ -164,9 +164,12 @@ No-result searches do not establish novelty or permission to build.
 
 ## Mac mini AI worker
 
-`CODEX_SSH_TARGET` selects an SSH user@host; `CODEX_BINARY` is the absolute remote
-Codex executable path. The Mac mini must be reachable over Tailscale, have its SSH
-host key trusted, and already be signed into Codex. The backend never copies login
+`CODEX_MODE` selects `ssh` (default) or `local`. In `ssh` mode,
+`CODEX_SSH_TARGET` is an SSH user@host and the Mac mini must be reachable over
+Tailscale, have its SSH host key trusted, and already be signed into Codex. In
+`local` mode the backend runs the Codex binary on its own host, which is how the
+Mac mini serves the shared demo; no SSH target is needed. Either way
+`CODEX_BINARY` is the absolute Codex executable path. The backend never copies login
 tokens. It pipes data through stdin to a fresh `codex exec` process and validates
 the returned JSON. User config is ignored, sessions are ephemeral, and shell,
 browser, app, plugin, and agent delegation features are disabled for these calls.
@@ -184,23 +187,32 @@ or a proposed alternative. The founder and a patent professional review these.
 
 ## What comes next
 
-Connect the frontend, add a real patent-search key, and measure time to a verified
-research shortlist against the same manual task. Do not claim live search has
-been tested until the configured provider completes a real request.
+Measure time to a verified research shortlist against the same manual task.
 
 ## Storage and deployment limits
 
 This is a local hackathon backend. Reports expire after one hour, are capped at
 100, and disappear on restart. Report IDs act as unguessable access links.
-There is no user authentication, persistent database, or production rate limiter.
-Keep the default loopback binding; add authentication, access controls, and cost
-limits before exposing it publicly. Requests and invention text are not logged.
+The local API on port 3001 has no user authentication, persistent database, or
+production rate limiter; keep its loopback binding and never tunnel it. The
+shared gateway on port 3002 is the only server meant to be reachable by
+teammates, and it adds authentication, budgets, and per-user report ownership.
+See `docs/SHARED_TESTING.md`. Requests and invention text are not logged.
 
-The 18 automated tests pass using artificial provider responses and no external
-API calls. The separate live Mac mini check passed query planning and comparison
-(two cited comparisons and one proposed alternative using artificial evidence).
-Run `npm run check:codex` to repeat that opt-in check. Real patent-provider
-credentials, patent retrieval, and frontend integration remain to be tested.
+The 55 automated tests pass using artificial provider responses and no external
+API calls.
+
+**Verified live, 2026-09-19.** One real SerpApi request with a fictional idea
+returned HTTP 201 in 2.7s: ten results for one query, five records kept, detail
+retrieval for the first three (abstract and claim passages) and search snippets
+only for the remaining two, exactly as documented above. All three exports were
+produced from that live report, including a PDF typeset by pdflatex.
+
+**Not verified.** The Mac mini Codex worker has not been exercised from this
+checkout; `npm run check:codex` repeats that opt-in check where SSH or a local
+Codex binary is available. Because analysis was unavailable, the live run
+produced no comparisons or alternatives — that path remains untested against
+real provider text.
 
 ## Provider documentation
 

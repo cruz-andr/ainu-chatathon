@@ -31,8 +31,8 @@ Don't use `npm start` on the teammate machine for this workflow.
 ### Mac mini standalone service (current deployment)
 
 The entire application and Cloudflare tunnel run on the Mac mini, not the laptop.
-Its private `.env` uses `CODEX_MODE=local`, `CODEX_BINARY` pointing at its existing
-CLI, and the patent-provider key. Codex is spawned directly with stdin input and
+Its private `.env` holds `CODEX_BINARY` pointing at its existing CLI and the
+patent-provider key; the LaunchAgent sets `CODEX_MODE=local`. Codex is spawned directly with stdin input and
 the same restricted flags; no runtime SSH or Tailscale connection is required.
 
 `deploy/com.ainu.patent-demo.plist` is the user LaunchAgent for this host. It runs

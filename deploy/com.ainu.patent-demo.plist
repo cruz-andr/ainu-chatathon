@@ -11,7 +11,10 @@
   </array>
   <key>WorkingDirectory</key><string>/Users/acruz/projects/ainu-chatathon</string>
   <key>EnvironmentVariables</key>
-  <dict><key>PATH</key><string>/Users/acruz/.local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string></dict>
+  <dict>
+    <key>PATH</key><string>/Users/acruz/.local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+    <key>CODEX_MODE</key><string>local</string>
+  </dict>
   <key>RunAtLoad</key><true/>
   <key>KeepAlive</key><true/>
   <key>ThrottleInterval</key><integer>30</integer>

@@ -4,6 +4,8 @@ import { validateResearch, validatePlanRequest } from './validation.js';
 import { ReportStore } from './research.js';
 import { runResearch } from './run-research.js';
 import { toMarkdown } from './brief.js';
+import { toLatex } from './latex.js';
+import { toPdf } from './pdf.js';
 
 export async function readJson(req) {
   if (req.headers['content-type']?.split(';')[0].trim() !== 'application/json') {
@@ -61,16 +63,33 @@ export function createApp({ provider, ai, store = new ReportStore(), frontendOri
         } finally { activeResearch--; }
         return;
       }
-      const match = path.match(/^\/api\/research\/([0-9a-f-]{36})(\/brief\.md)?$/);
+      const match = path.match(/^\/api\/research\/([0-9a-f-]{36})(?:\/brief\.(md|tex|pdf))?$/);
       if (req.method === 'GET' && match) {
         const report = store.get(match[1]);
         if (!report) throw new ApiError(404, 'REPORT_NOT_FOUND', 'Report not found or expired. Run the search again.');
-        if (match[2]) {
+        // Each export escapes source text for its own format; none is HTML.
+        if (match[2] === 'pdf') {
+          // Typesetting is slow; bound it so a stuck run cannot hold the socket.
+          const pdf = await toPdf(toLatex(report), { timeoutMs: 12_000 });
           res.writeHead(200, {
-            'Content-Type': 'text/markdown; charset=utf-8',
-            'Content-Disposition': `attachment; filename="patent-research-${report.id}.md"`,
+            'Content-Type': 'application/pdf',
+            'Content-Length': pdf.length,
+            'Content-Disposition': `inline; filename="patent-research-${report.id}.pdf"`,
           });
-          res.end(toMarkdown(report));
+          res.end(pdf);
+          return;
+        }
+        const exports = {
+          md: { type: 'text/markdown', render: toMarkdown },
+          tex: { type: 'application/x-tex', render: toLatex },
+        };
+        const format = exports[match[2]];
+        if (format) {
+          res.writeHead(200, {
+            'Content-Type': `${format.type}; charset=utf-8`,
+            'Content-Disposition': `attachment; filename="patent-research-${report.id}.${match[2]}"`,
+          });
+          res.end(format.render(report));
         } else send(200, report);
         return;
       }

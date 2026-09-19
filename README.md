@@ -70,6 +70,8 @@ the rules that apply to changes in this directory.
 | POST | `/api/research` | Runs up to three searches and returns a report |
 | GET | `/api/research/:id` | Retrieves a completed in-memory report |
 | GET | `/api/research/:id/brief.md` | Downloads the source-linked Markdown brief |
+| GET | `/api/research/:id/brief.tex` | Downloads the LaTeX briefing for professional review |
+| GET | `/api/research/:id/brief.pdf` | Typesets that briefing with pdflatex and returns the PDF |
 
 Start with `POST /api/plan` (fictional invention):
 

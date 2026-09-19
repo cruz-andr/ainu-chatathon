@@ -43,6 +43,8 @@ Read README.md for the full API contract. Key files:
 | `backend/providers/codex-cli.js` | Headless Codex via SSH; planning, comparison, alternatives, citation validation |
 | `backend/research.js` | Search aggregation, deduplication, coverage, ephemeral report store |
 | `backend/brief.js` | Markdown report export |
+| `backend/latex.js` | LaTeX briefing export; escapes TeX control characters |
+| `backend/pdf.js` | Typesets the LaTeX with pdflatex; shell escape and file access disabled |
 | `frontend/src/app.js` | Flow: idea, reviewed plan, search, report |
 | `frontend/src/render.js` | Report rendering and the `textContent` escaping boundary |
 | `frontend/src/api.js` | API client; field names mirror the README |
@@ -70,7 +72,10 @@ Read README.md for the full API contract. Key files:
 
 5. Render `patents` with source links and `evidence` passages. Show `analysis`
    comparisons and alternative approaches alongside their citations and questions.
-6. `GET /api/research/:id` retrieves the report; `/api/research/:id/brief.md` downloads it.
+6. `GET /api/research/:id` retrieves the report. `brief.md`, `brief.tex`, and
+   `brief.pdf` under that path export it. The LaTeX source is the version for a
+   patent professional; `brief.pdf` typesets it server-side and returns 503
+   `PDF_NOT_CONFIGURED` when pdflatex is absent.
 
 Use a loading state for the synchronous research request (allow up to three
 minutes). There is no streaming/progress/jobs endpoint. `GET /api/health` says

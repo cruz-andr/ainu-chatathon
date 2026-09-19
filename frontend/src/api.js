@@ -69,4 +69,4 @@ export const research = ({ idea, features, queries, country, maxResults, analyze
     ...(analyze ? { analyze: true, allowExternalAi: true } : {}),
   });
 
-export const briefUrl = (id) => `${API_BASE}/api/research/${id}/brief.md`;
+export const briefUrl = (id, format = 'md') => `${API_BASE}/api/research/${id}/brief.${format}`;

@@ -3,33 +3,38 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Report layout preview — artificial fixture</title>
+<title>Briefing preview — artificial fixture</title>
 <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
 
 <header class="masthead">
   <p class="wordmark">Prior Art</p>
-  <p class="kicker">Layout preview</p>
+  <p class="kicker">Briefing preview</p>
 </header>
 
-<main>
+<main class="preview-main">
   <div class="error" role="alert">
     <p><strong>Artificial fixture. Not research output.</strong></p>
     <p class="meta">
-      Every publication number, title, date and passage on this page is invented
-      for layout development. No search and no model were run. Never show this
-      page in a demo.
+      Every publication number, title, date and passage in this document is
+      invented for layout development. No search and no model were run. Never
+      show this page in a demo.
     </p>
   </div>
 
-  <div id="report"></div>
+  <p class="meta">
+    This is the compiled PDF exactly as a founder receives it — not an HTML
+    mock-up. Edit <code>backend/latex.js</code>, run
+    <code>npm run render:fixture</code>, then reload this page.
+  </p>
+
+  <div id="viewer" class="viewer"></div>
 </main>
 
 <footer>
   <p>
-    Layout development only. Edit <code>frontend/src/render.js</code> and reload.
-    The live app is at <a href="./index.html">index.html</a>.
+    Layout development only. The live app is at <a href="./index.html">index.html</a>.
   </p>
 </footer>
 

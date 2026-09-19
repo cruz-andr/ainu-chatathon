@@ -1,17 +1,31 @@
-// Renders the artificial fixture through the real report renderer so layout can
-// be developed offline. Loaded only by preview.html, never by the live app, so
-// no fixture can reach a real report path.
-import { renderReport } from './render.js';
+// Embeds the compiled fixture PDF so layout is reviewed in the format the
+// founder actually receives, rather than in an HTML approximation of it.
+// Loaded only by preview.html, so no fixture can reach a live report path.
 
-const mount = document.getElementById('report');
+const viewer = document.getElementById('viewer');
+const PDF_PATH = '/output/fixture-brief.pdf';
+
+function fallback(message) {
+  const note = document.createElement('p');
+  note.className = 'notice';
+  note.textContent = message;
+  const hint = document.createElement('p');
+  hint.className = 'meta';
+  hint.textContent = 'Run "npm run render:fixture" from the project root, then reload. '
+    + 'It needs pdflatex on the PATH.';
+  viewer.replaceChildren(note, hint);
+}
 
 try {
-  const response = await fetch('/data/fixture-report.json');
+  // HEAD first so a missing or un-compiled PDF gives a real explanation
+  // instead of an empty grey embed.
+  const response = await fetch(PDF_PATH, { method: 'HEAD' });
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  renderReport(await response.json(), mount);
+  const frame = document.createElement('iframe');
+  frame.className = 'pdf-frame';
+  frame.title = 'Compiled briefing preview (artificial fixture)';
+  frame.src = PDF_PATH;
+  viewer.replaceChildren(frame);
 } catch (error) {
-  const message = document.createElement('p');
-  message.className = 'notice';
-  message.textContent = `Could not load the fixture (${error.message}). Run "npm run frontend" from the project root.`;
-  mount.append(message);
+  fallback(`The compiled briefing is not available (${error.message}).`);
 }

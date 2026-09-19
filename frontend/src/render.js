@@ -229,9 +229,18 @@ export function renderReport(report, mount) {
   );
   head.append(badges, el('p', 'notice', STATUS_NOTE[report.status] ?? ''));
 
-  const download = el('a', 'button ghost', 'Download the brief (.md)');
-  download.href = briefUrl(report.id);
-  head.append(download);
+  const downloads = el('p', 'downloads');
+  const latex = el('a', 'button', 'Download the briefing (LaTeX)');
+  latex.href = briefUrl(report.id, 'tex');
+  const pdf = el('a', 'button ghost', 'View as PDF');
+  pdf.href = briefUrl(report.id, 'pdf');
+  pdf.target = '_blank';
+  pdf.rel = 'noopener noreferrer';
+  const markdown = el('a', 'button ghost', 'Markdown');
+  markdown.href = briefUrl(report.id, 'md');
+  downloads.append(latex, pdf, markdown);
+  head.append(downloads);
+  head.append(el('p', 'meta', 'The LaTeX source is the version to take to a patent professional. The PDF is typeset from it on the server and needs pdflatex installed.'));
   mount.append(head);
 
   if (report.patents.length) {

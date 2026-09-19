@@ -13,8 +13,9 @@ test('Vercel build publishes only explicit assets and an isolated proxy function
   }
   execFileSync(process.execPath, ['scripts/build-vercel.js'], { cwd: directory });
   const output = join(directory, '.vercel/output');
-  const files = (await readdir(output, { recursive: true })).filter((name) => /\.(?:json|js|html|css)$/.test(name));
-  assert.equal(files.length, 10);
+  const files = (await readdir(output, { recursive: true })).filter((name) => /\.(?:json|js|html|css|svg)$/.test(name));
+  assert.equal(files.length, 11);
+  assert.ok(files.includes('static/patrick.svg'));
   assert.ok(!files.some((name) => /fixture|preview|login|sqlite|codex-cli/.test(name)));
   const config = JSON.parse(await readFile(join(output, 'config.json')));
   assert.equal(config.version, 3);

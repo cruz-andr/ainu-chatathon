@@ -10,6 +10,7 @@ if (!/^https:\/\/[a-zA-Z0-9.-]+(?::\d+)?$/.test(upstream ?? '') || !/^[a-f0-9]{2
 }
 const port = 5174;
 const assets = new Map([['/', 'index.html'], ['/index.html', 'index.html'], ['/styles.css', 'styles.css'],
+  ['/patrick.svg', 'patrick.svg'],
   ...['api', 'app', 'render'].map((name) => [`/src/${name}.js`, `src/${name}.js`])]);
 const server = createServer(async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
@@ -34,7 +35,7 @@ const server = createServer(async (req, res) => {
     if (req.method === 'GET' && !url.search && assets.has(url.pathname)) {
       const name = assets.get(url.pathname);
       const body = await readFile(new URL(`../frontend/${name}`, import.meta.url));
-      res.writeHead(200, { 'Content-Type': name.endsWith('.js') ? 'text/javascript' : name.endsWith('.css') ? 'text/css' : 'text/html' }); res.end(body); return;
+      res.writeHead(200, { 'Content-Type': name.endsWith('.js') ? 'text/javascript' : name.endsWith('.css') ? 'text/css' : name.endsWith('.svg') ? 'image/svg+xml' : 'text/html' }); res.end(body); return;
     }
     res.writeHead(404).end();
   } catch {

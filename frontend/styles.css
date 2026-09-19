@@ -19,6 +19,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 
 body {
   margin: 0;
@@ -96,6 +97,7 @@ blockquote { margin: 0 0 0.75rem; }
 .ask label { display: block; font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem; }
 
 textarea, input[type="text"], input[type="password"], select {
+  min-width: 0; max-width: 100%;
   width: 100%; padding: 0.75rem 0.85rem;
   font: inherit; color: var(--ink);
   background: var(--card);
@@ -180,6 +182,7 @@ legend { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; 
 
 .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.9rem; }
 .chip {
+  max-width: 100%; min-width: 0; overflow-wrap: anywhere;
   display: inline-flex; align-items: center; gap: 0.5rem;
   padding: 0.35rem 0.5rem 0.35rem 0.75rem; font-size: 0.88rem;
   background: var(--soft); border: 1px solid var(--rule); border-radius: 999px;
@@ -190,6 +193,9 @@ legend { font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; 
 }
 .chip-remove:hover { color: var(--blue); }
 .query-row { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem; }
+.query-row input { min-width: 0; }
+.chip-remove { flex-shrink: 0; }
+.patent, .comparison, .alternative, .restate, .report-head { overflow-wrap: anywhere; }
 
 /* running */
 .running { padding: 4rem 0; text-align: center; }
@@ -390,4 +396,14 @@ footer p { font-size: 0.82rem; color: var(--muted); margin: 0; max-width: 34rem;
   .marketing.band { padding: 2rem 1.5rem; border-radius: 14px; }
   .dossier dl > div, .layers li { grid-template-columns: 1fr; }
   .layers li { gap: 0.25rem; }
+}
+
+@media (max-width: 30rem) {
+  main { padding-inline: 1rem; }
+  .marketing.band { padding-inline: 1rem; }
+  .translate, .cards, .trust { grid-template-columns: minmax(0, 1fr); }
+  .row label { flex-wrap: wrap; min-width: 0; }
+  .positioning th, .positioning td { padding: 0.6rem 0.4rem; overflow-wrap: anywhere; }
+  .positioning tbody th { white-space: normal; }
+  .button { max-width: 100%; }
 }

@@ -51,22 +51,30 @@ cat /Users/acruz/projects/ainu-chatathon/.runtime/public-url.txt
 ### PDF export on the mini
 
 `brief.pdf` shells out to `pdflatex`, so the mini needs a TeX installation.
-BasicTeX is enough and is about 100 MB against MacTeX's 6 GB:
+The current mini already has TinyTeX (TeX Live 2026), installed on 2026-09-19 at
+`/Users/acruz/Library/TinyTeX`, with the compiler linked from
+`/Users/acruz/.local/bin/pdflatex`. The running service already includes that
+directory in PATH. A sample and a real four-page PDF download through Vercel were
+verified. **No reinstall or service restart is needed for this host.**
+
+For a different Mac without TeX, BasicTeX is another installation option:
 
 ```sh
 brew install --cask basictex
 sudo /Library/TeX/texbin/tlmgr update --self
-sudo /Library/TeX/texbin/tlmgr install booktabs enumitem parskip geometry hyperref
+sudo /Library/TeX/texbin/tlmgr install booktabs enumitem parskip geometry hyperref cm-super
 ```
 
 The briefing preamble uses `inputenc`, `fontenc`, `geometry`, `longtable`,
 `booktabs`, `enumitem`, `parskip` and `hyperref`. MacTeX includes all of them
 and needs no `tlmgr` step.
 
-Installing TeX is not sufficient on its own. Launchd does not read a login
+For new installations, confirm the compiler is on the service's PATH. Launchd does not read a login
 shell, so the service only sees the `PATH` in its plist — which is why
 `deploy/com.ainu.patent-demo.plist` now lists `/Library/TeX/texbin`. Reload the
-agent after installing, then confirm from the service's own environment:
+agent only if its environment needs changing, then confirm the environment.
+**Restarting the host also restarts the temporary tunnel: update
+`MAC_MINI_API_URL` in Vercel and redeploy if its URL changes.**
 
 ```sh
 launchctl bootout gui/501 ~/Library/LaunchAgents/com.ainu.patent-demo.plist
@@ -74,7 +82,7 @@ launchctl bootstrap gui/501 ~/Library/LaunchAgents/com.ainu.patent-demo.plist
 launchctl print gui/501/com.ainu.patent-demo | grep -A2 PATH
 ```
 
-Setting `PDFLATEX_BINARY=/Library/TeX/texbin/pdflatex` in the mini's `.env`
+Setting `PDFLATEX_BINARY=/Library/TeX/texbin/pdflatex` in a BasicTeX host's `.env`
 works equally well and is the better choice if TeX lands somewhere else.
 Without either, `brief.pdf` returns 503 `PDF_NOT_CONFIGURED`; the report and
 the LaTeX download are unaffected, and the page says so rather than failing

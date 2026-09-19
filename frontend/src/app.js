@@ -34,13 +34,13 @@ function showError(message, hint) {
 const clearError = () => { $('error').hidden = true; };
 
 const HINTS = {
-  AI_NOT_CONFIGURED: 'The Mac mini Codex worker is not connected. Set CODEX_SSH_TARGET in the server .env.',
-  SEARCH_NOT_CONFIGURED: 'The patent search key is missing. Add SERPAPI_API_KEY to the server .env and restart.',
+  AI_NOT_CONFIGURED: 'The host needs to check the Mac mini AI worker. Visitors do not need SSH or an API key.',
+  SEARCH_NOT_CONFIGURED: 'The host needs to configure patent search. Visitors do not need an API key.',
   AI_BUSY: 'The Mac mini runs one AI request at a time. Wait a few seconds and run it again.',
   BUSY: 'Two searches are already running. Wait a few seconds and run it again.',
   AI_UNAVAILABLE: 'The Mac mini could not be reached, or the request timed out.',
   SEARCH_PROVIDER_UNAVAILABLE: 'The patent provider did not respond in time. Running it again usually works.',
-  NETWORK: 'Start the API with "npm start" in the project root, then try again.',
+  NETWORK: 'Check your connection or contact the host. Avoid resubmitting while a job may still be running.',
   QUEUE_FULL: 'The shared worker has a bounded queue. Wait for a current job to finish.',
   USAGE_LIMIT: 'The host has set a daily demo budget. Ask them before running more searches.',
 };
@@ -133,6 +133,7 @@ async function startPlan(event) {
   }
   state.idea = idea;
   const button = $('plan-submit');
+  const originalLabel = button.textContent;
   button.disabled = true;
   button.textContent = 'Reading your idea…';
   try {
@@ -154,7 +155,7 @@ async function startPlan(event) {
     }
   } finally {
     button.disabled = false;
-    button.textContent = 'Find what already exists';
+    button.textContent = originalLabel;
   }
   $('plan-idea').textContent = state.idea;
   renderFeatures();

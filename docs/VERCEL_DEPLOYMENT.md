@@ -21,11 +21,18 @@ patent API, reports and local Codex CLI. The MacBook is not part of this path.
 4. If Vercel itself asks visitors to log in, check project Deployment Protection;
    the intended public production deployment must permit unauthenticated access.
 
-The build emits Vercel Build Output API v3. Only five frontend assets and the
+The build emits Vercel Build Output API v3. Only six frontend assets (including the Patrick logo) and the
 isolated proxy module are deployed. No `.env`, fixture reports, SQLite database,
 Codex executable or login files are included. See
 [Vercel Build Output API](https://vercel.com/docs/build-output-api) and
 [environment variables](https://vercel.com/docs/environment-variables).
+
+Before publishing UI changes, run `npm test` and `npm run test:browser`. The
+browser check builds the allowlisted Vercel assets and exercises them in Chrome
+against artificial local responses, with no patent or AI calls. It checks consent,
+queued planning/report rendering, Patrick labels, hidden sections, mobile/desktop
+layout, PDF errors and reset. Set `CHROME_BINARY` if Chrome is not installed at
+the standard macOS path. The temporary server and browser are stopped afterward.
 
 ## Host operation
 
@@ -41,8 +48,10 @@ The LaunchAgent starts at login after a reboot; it is not a pre-login system dae
 Cloudflare Tunnel is the next step for unattended, durable hosting; it requires
 the owner's domain/Cloudflare account setup. Never tunnel unauthenticated port 3001.
 
-PDF download additionally requires `pdflatex` on the mini (optionally set
-`PDFLATEX_BINARY` to its absolute path in the mini's `.env`). Without it, PDF
+PDF download requires `pdflatex` on the mini. The current host has TinyTeX
+installed with `/Users/acruz/.local/bin/pdflatex` on the running service's PATH;
+live public PDF export was verified on 2026-09-19. For another host, optionally set
+`PDFLATEX_BINARY` to its absolute path in that host's `.env`. Without it, PDF
 returns an explicit configuration error; Markdown and LaTeX still work.
 
 ## Privacy and limits

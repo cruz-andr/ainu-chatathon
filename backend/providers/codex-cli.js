@@ -53,19 +53,22 @@ export function validateComparisons(output, patents, features) {
 }
 
 export class CodexCliProvider {
-  constructor({ target, binary = '/Users/acruz/.local/bin/codex', timeoutMs = 120_000, spawnImpl = spawn } = {}) {
+  constructor({ target, mode = 'ssh', binary = '/Users/acruz/.local/bin/codex', timeoutMs = 120_000, spawnImpl = spawn } = {}) {
     this.target = target;
+    this.mode = mode;
     this.binary = binary || '/Users/acruz/.local/bin/codex';
     this.timeoutMs = timeoutMs;
     this.spawnImpl = spawnImpl;
     this.busy = false;
   }
-  get configured() { return Boolean(this.target); }
+  get configured() { return this.mode === 'local' || Boolean(this.target); }
+  get providerName() { return this.mode === 'local' ? 'codex_cli_local' : 'codex_cli_ssh'; }
 
   async invoke(task, data, expected) {
     if (!this.configured) throw new ApiError(503, 'AI_NOT_CONFIGURED', 'Set CODEX_SSH_TARGET to enable the Mac mini AI worker.');
-    if (!/^[a-zA-Z0-9_][a-zA-Z0-9._-]*@[a-zA-Z0-9][a-zA-Z0-9.-]*$/.test(this.target) || !this.binary.startsWith('/')) {
-      throw new ApiError(503, 'AI_CONFIG_INVALID', 'Codex requires a user@host SSH target and an absolute binary path.');
+    if (!['ssh', 'local'].includes(this.mode) || !this.binary.startsWith('/')
+      || (this.mode === 'ssh' && !/^[a-zA-Z0-9_][a-zA-Z0-9._-]*@[a-zA-Z0-9][a-zA-Z0-9.-]*$/.test(this.target))) {
+      throw new ApiError(503, 'AI_CONFIG_INVALID', 'Choose local or ssh mode, an absolute binary path, and a valid SSH target when using ssh.');
     }
     if (this.busy) throw new ApiError(429, 'AI_BUSY', 'The Mac mini is processing another AI request. Try again shortly.');
     this.busy = true;
@@ -90,9 +93,14 @@ export class CodexCliProvider {
         task, `Required output shape: ${expected}`, 'INPUT_JSON:', JSON.stringify(data),
       ].join('\n');
       const stdout = await new Promise((resolve, reject) => {
-        const child = this.spawnImpl('ssh', ['-T', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=8',
-          '-o', 'StrictHostKeyChecking=yes', this.target, command], {
-          shell: false, stdio: ['pipe', 'pipe', 'pipe'], timeout: this.timeoutMs,
+        const executable = this.mode === 'local' ? this.binary : 'ssh';
+        const args = this.mode === 'local' ? flags : ['-T', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=8',
+          '-o', 'StrictHostKeyChecking=yes', this.target, command];
+        const childEnv = { ...process.env };
+        delete childEnv.SERPAPI_API_KEY;
+        delete childEnv.SHARED_API_TOKEN;
+        const child = this.spawnImpl(executable, args, {
+          shell: false, stdio: ['pipe', 'pipe', 'pipe'], timeout: this.timeoutMs, env: childEnv,
         });
         let output = '', size = 0;
         child.stdout.on('data', (chunk) => {
@@ -120,7 +128,7 @@ export class CodexCliProvider {
     const output = await this.invoke(
       'Extract 1–8 concrete invention features and propose 1–3 concise patent keyword search queries. Ask up to five questions about missing technical details. Use the founder description only.',
       { idea }, '{"features":["..."],"queries":["..."],"questions":["..."]}');
-    return { ...validatePlan(output), mode: 'ai', provider: 'codex_cli_ssh', requiresReview: true };
+    return { ...validatePlan(output), mode: 'ai', provider: this.providerName, requiresReview: true };
   }
 
   async compare(report) {
@@ -133,6 +141,7 @@ export class CodexCliProvider {
       { idea: report.input.idea, features: report.input.features, patents },
       '{"summary":"...","comparisons":[{"publicationNumber":"...","feature":"exact feature from input","relationship":"related or uncertain","explanation":"...","citations":[{"evidenceId":"...","quote":"exact source substring"}]}],"alternatives":[{"feature":"exact feature from input","approach":"...","tradeoffs":"...","questionsForProfessional":["..."],"citations":[{"evidenceId":"...","quote":"exact source substring"}]}],"questions":["..."]}');
     return { ...validateComparisons(output, patents, report.input.features),
+      provider: this.providerName,
       coverage: 'First three relevance/diversity-ranked records; up to twelve feature-selected passages per record with available parent claims, each limited to 3000 characters. Context may be omitted or truncated.' };
   }
 }

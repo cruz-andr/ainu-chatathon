@@ -10,7 +10,7 @@ if (!access.list().some((user) => access.active(user.id))) {
 }
 const server = createGateway({ access,
   provider: new SerpApiProvider({ apiKey: process.env.SERPAPI_API_KEY }),
-  ai: new CodexCliProvider({ target: process.env.CODEX_SSH_TARGET, binary: process.env.CODEX_BINARY }),
+  ai: new CodexCliProvider({ mode: process.env.CODEX_MODE || 'ssh', target: process.env.CODEX_SSH_TARGET, binary: process.env.CODEX_BINARY }),
   publicOrigin: process.env.PUBLIC_ORIGIN || '',
 });
 const port = Number(process.env.SHARE_PORT || 3002);

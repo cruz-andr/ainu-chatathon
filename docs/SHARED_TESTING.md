@@ -28,6 +28,43 @@ Don't use `npm start` on the teammate machine for this workflow.
 
 ## Host setup
 
+### Mac mini standalone service (current deployment)
+
+The entire application and Cloudflare tunnel run on the Mac mini, not the laptop.
+Its private `.env` uses `CODEX_MODE=local`, `CODEX_BINARY` pointing at its existing
+CLI, and the patent-provider key. Codex is spawned directly with stdin input and
+the same restricted flags; no runtime SSH or Tailscale connection is required.
+
+`deploy/com.ainu.patent-demo.plist` is the user LaunchAgent for this host. It runs
+`scripts/host-demo.js`, which supervises the tunnel and authenticated backend and
+writes the current public URL to `.runtime/public-url.txt` on the mini. Launchd
+restarts the supervisor if it fails. This user service starts at login, not before
+login after a reboot; keep the mini powered, online, awake, and logged in.
+
+On the mini:
+
+```sh
+launchctl print gui/501/com.ainu.patent-demo
+cat /Users/acruz/projects/ainu-chatathon/.runtime/public-url.txt
+```
+
+The service runs independently of Terminal and SSH sessions. A tunnel restart may
+change the temporary URL; the supervisor configures the new allowed origin
+automatically, but teammates must receive the new URL. For a stable URL, provision
+a named tunnel/domain. Logs contain startup information, not request bodies.
+
+To stop this service on the mini:
+
+```sh
+launchctl bootout gui/501 /Users/acruz/Library/LaunchAgents/com.ainu.patent-demo.plist
+```
+
+To start it again, replace `bootout` with `bootstrap` in that command. Only this
+project's LaunchAgent is affected. Codes and usage history remain in SQLite;
+in-memory reports and browser sessions do not survive a service restart.
+
+### Manual host setup (alternative)
+
 1. Keep the private `.env` with SerpApi and Mac mini SSH settings on your machine.
 2. Run `npm run team:access -- create ved`. It writes a 24-hour code into a
    mode-600 file under `.runtime/`; share that code privately. Do not commit it.

@@ -129,6 +129,37 @@ test('AI configuration errors and busy worker are explicit', async () => {
   await assert.rejects(ai.plan('idea'), { code: 'AI_BUSY' });
 });
 
+test('local Mac mini mode invokes Codex directly with stdin only and the same restricted flags', async () => {
+  let captured;
+  const ai = new CodexCliProvider({ mode: 'local', binary: '/test/codex', spawnImpl: (command, args, options) => {
+    const child = new EventEmitter();
+    child.stdin = new PassThrough(); child.stdout = new PassThrough(); child.stderr = new PassThrough();
+    let prompt = '';
+    child.stdin.on('data', (chunk) => { prompt += chunk; });
+    child.stdin.on('finish', () => {
+      captured = { command, args, options, prompt };
+      child.stdout.end(JSON.stringify({ type: 'item.completed', item: { type: 'agent_message', text: JSON.stringify({ features, queries: ['soil moisture'], questions: [] }) } }) + '\n');
+      child.emit('close', 0);
+    });
+    return child;
+  } });
+  const attack = 'A sensor; INJECTION_SENTINEL `INJECTION_SENTINEL` $(INJECTION_SENTINEL)';
+  const plan = await ai.plan(attack);
+  assert.equal(ai.configured, true);
+  assert.equal(plan.provider, 'codex_cli_local');
+  assert.equal(captured.command, '/test/codex');
+  assert.equal(captured.options.shell, false);
+  assert.equal(captured.args.at(-1), '-');
+  assert.ok(captured.args.includes('read-only'));
+  assert.ok(captured.args.includes('--ignore-user-config'));
+  assert.ok(captured.args.includes('shell_tool'));
+  assert.ok(!captured.args.join(' ').includes('INJECTION_SENTINEL'));
+  assert.equal(captured.options.env.SERPAPI_API_KEY, undefined);
+  assert.equal(captured.options.env.SHARED_API_TOKEN, undefined);
+  assert.equal(JSON.parse(captured.prompt.split('\nINPUT_JSON:\n')[1]).idea, attack);
+  await assert.rejects(new CodexCliProvider({ mode: 'local', binary: 'relative/codex' }).plan('idea'), { code: 'AI_CONFIG_INVALID' });
+});
+
 test('HTTP AI planning works, requires disclosure, and comparison errors retain retrieved evidence', async (t) => {
   const ai = { configured: true, plan: async () => ({ features, queries: ['soil moisture'], questions: [], requiresReview: true }),
     compare: async () => { throw new ApiError(502, 'INVALID_AI_RESPONSE', 'Invalid citation'); } };

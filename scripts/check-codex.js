@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { CodexCliProvider } from '../backend/providers/codex-cli.js';
 
 // Opt-in integration check: uses your Codex account, but no patent API or real invention.
-const ai = new CodexCliProvider({ target: process.env.CODEX_SSH_TARGET, binary: process.env.CODEX_BINARY });
+const ai = new CodexCliProvider({ mode: process.env.CODEX_MODE || 'ssh', target: process.env.CODEX_SSH_TARGET, binary: process.env.CODEX_BINARY });
 console.log('Testing live Mac mini Codex with a fictional idea and clearly artificial evidence.');
 const idea = 'A plant container with a soil moisture sensor that opens a water valve when the soil is dry.';
 const plan = await ai.plan(idea);

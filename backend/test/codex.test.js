@@ -52,7 +52,7 @@ test('rejects invented quotes, wrong publications, unknown features, and unsuppo
 });
 
 test('Codex SSH invocation sends user input through stdin, with shell and web tools disabled', async () => {
-  let captured;
+  const calls = [];
   const ai = new CodexCliProvider({ target: 'tester@mac-mini', spawnImpl: (command, args, options) => {
     const child = new EventEmitter();
     child.stdin = new PassThrough(); child.stdout = new PassThrough(); child.stderr = new PassThrough();
@@ -60,28 +60,70 @@ test('Codex SSH invocation sends user input through stdin, with shell and web to
     let prompt = '';
     child.stdin.on('data', (chunk) => { prompt += chunk; });
     child.stdin.on('finish', () => {
-      captured = { command, args, options, prompt };
+      calls.push({ command, args, options, prompt });
       child.stdout.end(JSON.stringify({ type: 'item.completed', item: { type: 'agent_message',
         text: JSON.stringify({ features, queries: ['soil moisture'], questions: [] }) } }) + '\n');
       child.emit('close', 0);
     });
     return child;
   } });
-  const idea = 'A sensor; $(do-not-execute) `nor-this`';
-  const plan = await ai.plan(idea);
-  assert.equal(plan.provider, 'codex_cli_ssh');
+  const ideas = [
+    'A plain soil moisture sensor.',
+    'A sensor; INJECTION_SENTINEL; $(INJECTION_SENTINEL) `INJECTION_SENTINEL`',
+    'A sensor\' "; INJECTION_SENTINEL && INJECTION_SENTINEL || INJECTION_SENTINEL | INJECTION_SENTINEL',
+    'A sensor\nINJECTION_SENTINEL > INJECTION_SENTINEL\r\n$(INJECTION_SENTINEL)',
+    'A sensor --config INJECTION_SENTINEL; ${INJECTION_SENTINEL} < INJECTION_SENTINEL',
+  ];
+  for (const idea of ideas) {
+    const plan = await ai.plan(idea);
+    assert.equal(plan.provider, 'codex_cli_ssh');
+    const call = calls.at(-1);
+    assert.deepEqual(call.args, calls[0].args, 'Changing founder input must never change SSH argv');
+    assert.equal(call.options.shell, false);
+    assert.ok(!call.args.join(' ').includes('INJECTION_SENTINEL'));
+    const data = JSON.parse(call.prompt.split('\nINPUT_JSON:\n')[1]);
+    assert.equal(data.idea, idea, 'Preserve the original input as stdin JSON data');
+  }
+  const captured = calls[0];
   assert.equal(captured.command, 'ssh');
-  assert.ok(!captured.args.join(' ').includes('do-not-execute'));
-  assert.ok(captured.prompt.includes(idea));
   assert.ok(captured.args.at(-1).includes("'--disable' 'shell_tool'"));
   assert.ok(captured.args.at(-1).includes('web_search="disabled"'));
   assert.ok(captured.args.includes('StrictHostKeyChecking=yes'));
   assert.equal(ai.busy, false);
 });
 
+test('comparison sends founder features and patent passages over stdin, never SSH argv', async () => {
+  let captured;
+  const ai = new CodexCliProvider({ target: 'tester@mac-mini', spawnImpl: (command, args, options) => {
+    const child = new EventEmitter();
+    child.stdin = new PassThrough(); child.stdout = new PassThrough(); child.stderr = new PassThrough();
+    let prompt = '';
+    child.stdin.on('data', (chunk) => { prompt += chunk; });
+    child.stdin.on('finish', () => {
+      captured = { command, args, options, data: JSON.parse(prompt.split('\nINPUT_JSON:\n')[1]) };
+      child.stdout.end(JSON.stringify({ type: 'item.completed', item: { type: 'agent_message', text: JSON.stringify(output()) } }) + '\n');
+      child.emit('close', 0);
+    });
+    return child;
+  } });
+  const attack = 'INJECTION_SENTINEL; `INJECTION_SENTINEL` $(INJECTION_SENTINEL)\n\'"|&';
+  const records = structuredClone(patents);
+  records[0].title = attack;
+  records[0].evidence.push({ id: 'TEST_ONLY:untrusted', section: 'claim', text: attack });
+  const report = { input: { idea: attack, features: [...features, attack] }, patents: records };
+  await ai.compare(report);
+  assert.ok(!captured.args.join(' ').includes('INJECTION_SENTINEL'));
+  assert.equal(captured.options.shell, false);
+  assert.equal(captured.data.idea, attack);
+  assert.equal(captured.data.features[1], attack);
+  assert.equal(captured.data.patents[0].title, attack);
+  assert.equal(captured.data.patents[0].evidence[1].text, attack);
+});
+
 test('AI configuration errors and busy worker are explicit', async () => {
   await assert.rejects(new CodexCliProvider().plan('idea'), { code: 'AI_NOT_CONFIGURED' });
   await assert.rejects(new CodexCliProvider({ target: '-o proxycommand=bad' }).plan('idea'), { code: 'AI_CONFIG_INVALID' });
+  await assert.rejects(new CodexCliProvider({ target: '-V@mac-mini' }).plan('idea'), { code: 'AI_CONFIG_INVALID' });
   const ai = new CodexCliProvider({ target: 'tester@mac-mini' });
   ai.busy = true;
   await assert.rejects(ai.plan('idea'), { code: 'AI_BUSY' });

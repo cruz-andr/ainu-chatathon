@@ -63,7 +63,7 @@ export class CodexCliProvider {
 
   async invoke(task, data, expected) {
     if (!this.configured) throw new ApiError(503, 'AI_NOT_CONFIGURED', 'Set CODEX_SSH_TARGET to enable the Mac mini AI worker.');
-    if (!/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+$/.test(this.target) || !this.binary.startsWith('/')) {
+    if (!/^[a-zA-Z0-9_][a-zA-Z0-9._-]*@[a-zA-Z0-9][a-zA-Z0-9.-]*$/.test(this.target) || !this.binary.startsWith('/')) {
       throw new ApiError(503, 'AI_CONFIG_INVALID', 'Codex requires a user@host SSH target and an absolute binary path.');
     }
     if (this.busy) throw new ApiError(429, 'AI_BUSY', 'The Mac mini is processing another AI request. Try again shortly.');
@@ -77,6 +77,8 @@ export class CodexCliProvider {
         flags.push('--disable', feature);
       }
       flags.push('-');
+      // Only server-controlled configuration/flags belong in the remote shell command.
+      // Founder input and retrieved patent text must travel exclusively through stdin.
       const command = [this.binary, ...flags].map(quoteShell).join(' ');
       const prompt = [
         'You are a patent research assistant for an early-stage product founder.',
@@ -89,7 +91,7 @@ export class CodexCliProvider {
       const stdout = await new Promise((resolve, reject) => {
         const child = this.spawnImpl('ssh', ['-T', '-o', 'BatchMode=yes', '-o', 'ConnectTimeout=8',
           '-o', 'StrictHostKeyChecking=yes', this.target, command], {
-          stdio: ['pipe', 'pipe', 'pipe'], timeout: this.timeoutMs,
+          shell: false, stdio: ['pipe', 'pipe', 'pipe'], timeout: this.timeoutMs,
         });
         let output = '', size = 0;
         child.stdout.on('data', (chunk) => {

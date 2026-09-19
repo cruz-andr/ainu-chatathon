@@ -7,3 +7,4 @@ coverage/
 .claude/launch.json
 output/
 .runtime/
+.vercel/

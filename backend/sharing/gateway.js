@@ -1,10 +1,12 @@
 import { createServer } from 'node:http';
-import { randomBytes, createHash } from 'node:crypto';
+import { randomBytes, createHash, timingSafeEqual } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { readJson } from '../app.js';
 import { ApiError } from '../errors.js';
 import { validatePlanRequest, validateResearch } from '../validation.js';
 import { toMarkdown } from '../brief.js';
+import { toLatex } from '../latex.js';
+import { toPdf } from '../pdf.js';
 import { runResearch } from '../run-research.js';
 import { Jobs } from './jobs.js';
 
@@ -16,7 +18,9 @@ const assets = new Map([
   ...['api', 'app', 'render', 'login'].map((name) => [`/src/${name}.js`, [`src/${name}.js`, 'text/javascript']]),
 ]);
 
-export function createGateway({ access, provider, ai, publicOrigin = '', now = Date.now }) {
+export function createGateway({ access, provider, ai, publicOrigin = '', proxyKey = '', now = Date.now }) {
+  if (proxyKey && !/^[a-f0-9]{64}$/.test(proxyKey)) throw new Error('Invalid private proxy key.');
+  let pdfBusy = false;
   if (publicOrigin && (!/^https:\/\/[a-zA-Z0-9.-]+(?::\d+)?$/.test(publicOrigin))) throw new Error('PUBLIC_ORIGIN must be an exact HTTPS origin with no path.');
   const publicHost = publicOrigin ? new URL(publicOrigin).host : null;
   const sessions = new Map(), requestBuckets = new Map();
@@ -31,6 +35,10 @@ export function createGateway({ access, provider, ai, publicOrigin = '', now = D
     if (bucket.count > limit) throw new ApiError(429, 'RATE_LIMIT', 'Too many requests. Wait one minute and try again.');
   }
   function identity(req) {
+    const bearer = req.headers.authorization?.replace(/^Bearer /, '');
+    if (proxyKey && /^[a-f0-9]{64}$/.test(bearer ?? '') && timingSafeEqual(Buffer.from(bearer, 'hex'), Buffer.from(proxyKey, 'hex'))) {
+      return access.visitor(req.headers['x-visitor-id'], req.headers['x-visitor-network']);
+    }
     if (req.headers.authorization) return access.authenticate(req.headers.authorization.replace(/^Bearer /, ''));
     const cookie = req.headers.cookie?.split(';').map((part) => part.trim()).find((part) => part.startsWith('priorart_session='))?.slice(17);
     if (!cookie || !/^[a-f0-9]{64}$/.test(cookie)) return null;
@@ -99,12 +107,24 @@ export function createGateway({ access, provider, ai, publicOrigin = '', now = D
         if (!job) throw new ApiError(404, 'JOB_NOT_FOUND', 'Job not found or expired.');
         send(200, job); return;
       }
-      const reportMatch = path.match(/^\/api\/research\/([a-f0-9-]{36})(\/brief\.md)?$/);
+      const reportMatch = path.match(/^\/api\/research\/([a-f0-9-]{36})(?:\/brief\.(md|tex|pdf))?$/);
       if (req.method === 'GET' && reportMatch) {
         const report = jobs.report(reportMatch[1], user.id);
         if (!report) throw new ApiError(404, 'REPORT_NOT_FOUND', 'Report not found or expired.');
         if (!reportMatch[2]) send(200, report);
-        else { res.writeHead(200, { 'Content-Type': 'text/markdown; charset=utf-8', 'Content-Disposition': `attachment; filename="patent-research-${report.id}.md"` }); res.end(toMarkdown(report)); }
+        else if (reportMatch[2] === 'pdf') {
+          throttle(`pdf:${user.id}`, 2);
+          if (pdfBusy) throw new ApiError(429, 'PDF_BUSY', 'A PDF is being prepared. Try again shortly.');
+          pdfBusy = true;
+          try {
+            const pdf = await toPdf(toLatex(report), { timeoutMs: 10000 });
+            res.writeHead(200, { 'Content-Type': 'application/pdf', 'Content-Disposition': `attachment; filename="patent-research-${report.id}.pdf"` }); res.end(pdf);
+          } finally { pdfBusy = false; }
+        } else {
+          const tex = reportMatch[2] === 'tex';
+          res.writeHead(200, { 'Content-Type': `${tex ? 'application/x-tex' : 'text/markdown'}; charset=utf-8`, 'Content-Disposition': `attachment; filename="patent-research-${report.id}.${reportMatch[2]}"` });
+          res.end(tex ? toLatex(report) : toMarkdown(report));
+        }
         return;
       }
       if (req.method === 'GET' && assets.has(path)) {

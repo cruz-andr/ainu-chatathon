@@ -63,6 +63,10 @@ If a change would require softening one of these, stop and raise it instead.
   controls and must never be tunneled. Only the shared gateway on port 3002 may
   be tunneled: it enforces authentication, SQLite-backed budgets, request limits,
   per-user report ownership and a serialized job queue. See docs/SHARED_TESTING.md.
+- The public Vercel frontend uses a server-only proxy credential and signed
+  anonymous browser sessions; visitors do not need teammate codes. Never expose
+  that credential in client assets. Preserve visitor/network/global budgets and
+  owner-scoped jobs; see docs/VERCEL_DEPLOYMENT.md. Only allowlisted assets ship.
 
 ## Frontend rules
 

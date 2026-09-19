@@ -2,9 +2,12 @@ import { AccessStore } from './access.js';
 import { createGateway } from './gateway.js';
 import { SerpApiProvider } from '../providers/serpapi.js';
 import { CodexCliProvider } from '../providers/codex-cli.js';
+import { readFileSync, existsSync } from 'node:fs';
 
 const access = new AccessStore();
-if (!access.list().some((user) => access.active(user.id))) {
+const keyPath = '.runtime/vercel-proxy-key';
+const proxyKey = existsSync(keyPath) ? readFileSync(keyPath, 'utf8').trim() : '';
+if (!proxyKey && !access.list().some((user) => access.active(user.id))) {
   access.close();
   throw new Error('Create an expiring teammate access code with npm run team:access -- create NAME first.');
 }
@@ -12,6 +15,7 @@ const server = createGateway({ access,
   provider: new SerpApiProvider({ apiKey: process.env.SERPAPI_API_KEY }),
   ai: new CodexCliProvider({ mode: process.env.CODEX_MODE || 'ssh', target: process.env.CODEX_SSH_TARGET, binary: process.env.CODEX_BINARY }),
   publicOrigin: process.env.PUBLIC_ORIGIN || '',
+  proxyKey,
 });
 const port = Number(process.env.SHARE_PORT || 3002);
 server.listen(port, '127.0.0.1', () => {

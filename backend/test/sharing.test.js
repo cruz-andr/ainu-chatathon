@@ -156,6 +156,11 @@ test('authenticated jobs return results, enforce report ownership, and support b
   assert.equal((await request(`/api/research/${id}`, { token: b.token })).status, 404);
   assert.equal((await request(`/api/research/${id}/brief.md`, { token: b.token })).status, 404);
   assert.equal((await request(`/api/research/${id}/brief.md`, { token: a.token })).status, 200);
+  assert.equal((await request(`/api/research/${id}/brief.tex`, { token: b.token })).status, 404);
+  assert.equal((await request(`/api/research/${id}/brief.pdf`, { token: b.token })).status, 404);
+  const tex = await request(`/api/research/${id}/brief.tex`, { token: a.token });
+  assert.equal(tex.status, 200);
+  assert.match(await tex.text(), /documentclass/);
   const planning = await request('/api/plan', { token: a.token, body: plan }).then((r) => r.json());
   await tick();
   assert.equal((await request(`/api/jobs/${planning.jobId}`, { token: a.token }).then((r) => r.json())).result.features[0], 'sensor');

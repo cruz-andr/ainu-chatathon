@@ -21,7 +21,7 @@ const server = createServer(async (req, res) => {
       res.writeHead(403).end(); return;
     }
     const url = new URL(req.url, 'http://localhost');
-    const apiRoute = /^\/api\/(?:health|plan|research|jobs\/[a-f0-9-]{36}|research\/[a-f0-9-]{36}(?:\/brief\.md)?)$/.test(url.pathname);
+    const apiRoute = /^\/api\/(?:health|plan|research|jobs\/[a-f0-9-]{36}|research\/[a-f0-9-]{36}(?:\/brief\.(?:md|tex|pdf))?)$/.test(url.pathname);
     if (!url.search && apiRoute && ['GET', 'POST'].includes(req.method)) {
       if (req.method === 'POST' && !req.headers.origin) { res.writeHead(403).end(); return; }
       const body = req.method === 'POST' ? JSON.stringify(await readJson(req)) : undefined;

@@ -20,7 +20,7 @@ async function call(path, options = {}) {
   } catch {
     throw new ApiFailure(
       'NETWORK',
-      `Could not reach the research API at ${API_BASE}. Start it with "npm start".`,
+      localPreview ? `Could not reach the research API at ${API_BASE}. Start it with "npm start".` : 'Could not reach the research service. Check your connection or contact the host.',
       0,
     );
   }

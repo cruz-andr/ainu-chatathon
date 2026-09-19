@@ -11,6 +11,7 @@
     "start": "node --env-file-if-exists=.env backend/server.js",
     "test": "node --test backend/test/*.test.js",
     "check:codex": "node --env-file-if-exists=.env scripts/check-codex.js",
-    "frontend": "node scripts/serve-frontend.js"
+    "frontend": "node scripts/serve-frontend.js",
+    "render:fixture": "node scripts/render-fixture.js"
   }
 }

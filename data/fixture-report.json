@@ -1,0 +1,170 @@
+{
+  "_fixture": "ARTIFICIAL TEST FIXTURE. Every publication number, title, assignee, date and passage below is invented for layout development. Nothing here is a real patent record. Never present this as research output.",
+  "id": "00000000-0000-4000-8000-000000000000",
+  "createdAt": "2026-01-01T00:00:00.000Z",
+  "mode": "fixture",
+  "provider": "artificial_fixture",
+  "status": "partial",
+  "elapsedMs": 91000,
+  "input": {
+    "idea": "FIXTURE IDEA: a tabletop planter with an integrated reservoir, a soil moisture sensor, a controller-driven pump, and a threshold the owner can adjust.",
+    "features": [
+      "FIXTURE: soil moisture sensor in the soil volume",
+      "FIXTURE: controller-driven pump fed from an integrated reservoir",
+      "FIXTURE: owner-adjustable moisture threshold",
+      "FIXTURE: tabletop form factor with concealed reservoir"
+    ],
+    "queries": ["fixture query one", "fixture query two"],
+    "country": "US"
+  },
+  "searches": [
+    { "query": "fixture query one", "status": "completed", "resultCount": 10, "retrievedAt": "2026-01-01T00:00:00.000Z" },
+    { "query": "fixture query two", "status": "failed", "errorCode": "SEARCH_PROVIDER_UNAVAILABLE" }
+  ],
+  "patents": [
+    {
+      "id": "fixture/AA0000001A1",
+      "publicationNumber": "AA0000001A1",
+      "title": "FIXTURE RECORD A — sensor-governed irrigation assembly",
+      "sourceUrl": "https://example.invalid/fixture/AA0000001A1",
+      "assignees": ["Fixture Holdings LLC"],
+      "publicationDate": "2011-05-12",
+      "filingDate": "2009-11-02",
+      "priorityDate": "2008-11-02",
+      "grantDate": null,
+      "documentType": "published_application",
+      "legalStatus": { "value": "Unknown", "verified": false },
+      "retrievedAt": "2026-01-01T00:00:00.000Z",
+      "detailsRetrievedAt": "2026-01-01T00:00:00.000Z",
+      "detailsStatus": "available",
+      "matchedQueries": ["fixture query one"],
+      "evidence": [
+        { "id": "AA0000001A1:snippet", "section": "search_snippet", "text": "FIXTURE TEXT: an irrigation assembly in which a sensor governs delivery of water to a growing medium." },
+        { "id": "AA0000001A1:abstract", "section": "abstract", "text": "FIXTURE TEXT: an assembly comprising a sensor positioned to report a condition of a growing medium, a controller receiving the report, and a delivery element actuated by the controller." },
+        { "id": "AA0000001A1:claim:1", "section": "claim", "text": "1. FIXTURE CLAIM: an apparatus comprising a sensor positioned within a growing medium and a controller coupled to the sensor." },
+        { "id": "AA0000001A1:claim:4", "section": "claim", "text": "4. FIXTURE CLAIM: the apparatus of claim 1, further comprising a pump actuated when the reported value falls below a stored setpoint." }
+      ]
+    },
+    {
+      "id": "fixture/AA0000002A1",
+      "publicationNumber": "AA0000002A1",
+      "title": "FIXTURE RECORD A — sensor-governed irrigation assembly",
+      "sourceUrl": "https://example.invalid/fixture/AA0000002A1",
+      "assignees": ["Fixture Holdings LLC"],
+      "publicationDate": "2012-02-20",
+      "filingDate": "2009-11-02",
+      "priorityDate": "2008-11-02",
+      "grantDate": null,
+      "documentType": "published_application",
+      "legalStatus": { "value": null, "verified": false },
+      "retrievedAt": "2026-01-01T00:00:00.000Z",
+      "detailsStatus": "available",
+      "matchedQueries": ["fixture query one"],
+      "evidence": [
+        { "id": "AA0000002A1:snippet", "section": "search_snippet", "text": "FIXTURE TEXT: an irrigation assembly in which a sensor governs delivery of water to a growing medium." },
+        { "id": "AA0000002A1:claim:1", "section": "claim", "text": "1. FIXTURE CLAIM: an apparatus comprising a sensor positioned within a growing medium and a controller coupled to the sensor." }
+      ]
+    },
+    {
+      "id": "fixture/BB0000003B2",
+      "publicationNumber": "BB0000003B2",
+      "title": "FIXTURE RECORD B — reservoir vessel with wicking channel",
+      "sourceUrl": "https://example.invalid/fixture/BB0000003B2",
+      "assignees": [],
+      "publicationDate": "2019-07-30",
+      "filingDate": "2017-01-15",
+      "priorityDate": null,
+      "grantDate": "2019-07-30",
+      "documentType": "granted_patent",
+      "legalStatus": { "value": "Active", "verified": false },
+      "retrievedAt": "2026-01-01T00:00:00.000Z",
+      "detailsStatus": "unavailable",
+      "matchedQueries": ["fixture query one"],
+      "evidence": [
+        { "id": "BB0000003B2:snippet", "section": "search_snippet", "text": "FIXTURE TEXT: a vessel holding a liquid volume beneath a growing region, connected by a passive channel." }
+      ]
+    },
+    {
+      "id": "fixture/CC0000004A1",
+      "publicationNumber": "CC0000004A1",
+      "title": "FIXTURE RECORD C — stacked cultivation frame",
+      "sourceUrl": "https://example.invalid/fixture/CC0000004A1",
+      "assignees": ["Fixture Growing Systems Inc."],
+      "publicationDate": "2015-10-08",
+      "filingDate": null,
+      "priorityDate": null,
+      "grantDate": null,
+      "documentType": "published_application",
+      "legalStatus": { "value": null, "verified": false },
+      "retrievedAt": "2026-01-01T00:00:00.000Z",
+      "detailsStatus": "not_requested",
+      "matchedQueries": ["fixture query one"],
+      "evidence": [
+        { "id": "CC0000004A1:snippet", "section": "search_snippet", "text": "FIXTURE TEXT: a frame supporting multiple growing regions in a vertical arrangement." }
+      ]
+    }
+  ],
+  "warnings": ["Search 2 failed; coverage is incomplete."],
+  "coverage": {
+    "publicationAuthority": "US",
+    "pagePerQuery": 1,
+    "resultsPerQuery": 10,
+    "uniquePublicationsRetrieved": 14,
+    "returnedPublications": 4,
+    "detailsRequested": 3,
+    "deduplication": "Provider default family grouping per query; publication number across queries.",
+    "exhaustive": false
+  },
+  "analysis": {
+    "status": "completed",
+    "provider": "artificial_fixture",
+    "summary": "FIXTURE SUMMARY: the reviewed passages describe sensor-governed delivery of water to a growing medium and a setpoint comparison. They do not describe an integrated tabletop reservoir or an owner-facing threshold control.",
+    "comparisons": [
+      {
+        "publicationNumber": "AA0000001A1",
+        "feature": "FIXTURE: soil moisture sensor in the soil volume",
+        "relationship": "related",
+        "explanation": "FIXTURE EXPLANATION: the claim places a sensor inside the growing medium, which is the same arrangement described in the idea.",
+        "citations": [{ "evidenceId": "AA0000001A1:claim:1", "quote": "a sensor positioned within a growing medium and a controller coupled to the sensor" }]
+      },
+      {
+        "publicationNumber": "AA0000002A1",
+        "feature": "FIXTURE: soil moisture sensor in the soil volume",
+        "relationship": "uncertain",
+        "explanation": "FIXTURE EXPLANATION: the passage repeats the same wording as the other record, so it adds no independent support.",
+        "citations": [{ "evidenceId": "AA0000002A1:claim:1", "quote": "a sensor positioned within a growing medium and a controller coupled to the sensor" }]
+      },
+      {
+        "publicationNumber": "AA0000001A1",
+        "feature": "FIXTURE: controller-driven pump fed from an integrated reservoir",
+        "relationship": "uncertain",
+        "explanation": "FIXTURE EXPLANATION: the passage describes a pump actuated against a stored setpoint but says nothing about where the water is held.",
+        "citations": [{ "evidenceId": "AA0000001A1:claim:4", "quote": "a pump actuated when the reported value falls below a stored setpoint" }]
+      }
+    ],
+    "alternatives": [
+      {
+        "status": "proposed_for_review",
+        "feature": "FIXTURE: soil moisture sensor in the soil volume",
+        "approach": "FIXTURE ALTERNATIVE: infer the water state from the mass of the vessel rather than probing the medium directly.",
+        "tradeoffs": "FIXTURE TRADEOFFS: avoids placing electronics in a wet medium, but needs per-plant calibration and is disturbed by anything resting on the vessel.",
+        "questionsForProfessional": [
+          "FIXTURE QUESTION: how broadly does the claim language read on an indirect measurement?",
+          "FIXTURE QUESTION: is mass-derived irrigation covered in a neighbouring classification?"
+        ],
+        "citations": [{ "evidenceId": "AA0000001A1:claim:1", "quote": "a sensor positioned within a growing medium and a controller coupled to the sensor" }]
+      }
+    ],
+    "questions": [
+      "FIXTURE QUESTION: how broadly does claim 1 read on a sensor placed outside the growing medium?",
+      "FIXTURE QUESTION: do the two records sharing a title belong to one family?"
+    ],
+    "coverage": "First three records; up to twelve passages per record, each limited to 3000 characters.",
+    "message": "FIXTURE: artificial analysis for layout development. No model was run."
+  },
+  "limitations": [
+    "Research assistance only; this is not a patentability or freedom-to-operate opinion.",
+    "No matches means none were retrieved by these searches, not that the invention is novel or safe to build.",
+    "Provider-reported legal status is not independently verified. Unpublished applications are not covered."
+  ]
+}

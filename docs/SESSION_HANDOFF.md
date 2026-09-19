@@ -146,7 +146,7 @@ markup. Layout work needs no SSH and no API key. See `docs/AI_OUTPUT_HANDOFF.md`
 | --- | --- |
 | `npm start` | API on `http://127.0.0.1:3001` |
 | `npm run frontend` | Static frontend on `http://localhost:5173` |
-| `npm test` | 55 offline tests; no network, no model |
+| `npm test` | 61 offline tests; no network, no model |
 | `npm run share` | Authenticated shared gateway on `http://127.0.0.1:3002` |
 | `npm run team:access` | Issue and revoke teammate access codes |
 | `npm run render:fixture` | Writes both fixture briefs, offline |
@@ -159,7 +159,7 @@ passes. Verified working; produces a ~170KB PDF from the fixture.
 
 ## 6. Current state (as of this handoff)
 
-**Verified.** 55/55 tests pass. `render:fixture` emits both formats. The LaTeX
+**Verified.** 61/61 tests pass. `render:fixture` emits both formats. The LaTeX
 compiles cleanly to PDF over two passes. The frontend flow was walked end to end
 in a browser: both failure paths (`AI_NOT_CONFIGURED`, `SEARCH_NOT_CONFIGURED`)
 surface with fix hints, the report renders every section, an XSS payload through

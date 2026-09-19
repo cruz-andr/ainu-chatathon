@@ -143,7 +143,7 @@ the authentication, budgets, and access controls; see `docs/SHARED_TESTING.md`.
 
 ## Collaboration
 
-Verified: all 55 automated tests pass. Live patent retrieval was confirmed on
+Verified: all 61 automated tests pass. Live patent retrieval was confirmed on
 2026-09-19 — one real SerpApi request with a fictional idea returned five
 records in 2.7s, with details for the first three, and all three exports were
 produced from that report. The Mac mini Codex worker has not been exercised

@@ -199,7 +199,7 @@ shared gateway on port 3002 is the only server meant to be reachable by
 teammates, and it adds authentication, budgets, and per-user report ownership.
 See `docs/SHARED_TESTING.md`. Requests and invention text are not logged.
 
-The 55 automated tests pass using artificial provider responses and no external
+The 61 automated tests pass using artificial provider responses and no external
 API calls.
 
 **Verified live, 2026-09-19.** One real SerpApi request with a fictional idea

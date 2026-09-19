@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { ApiError } from './errors.js';
+import { rankCandidates, suspectedRepetition } from './selection.js';
 
 export async function research(input, provider) {
   const started = Date.now();
@@ -25,7 +26,13 @@ export async function research(input, provider) {
     if (outcome.value.skippedRecords) warnings.push(`Search ${i + 1} contained ${outcome.value.skippedRecords} unusable records.`);
     return { query, status: 'completed', resultCount: outcome.value.patents.length, retrievedAt: outcome.value.retrievedAt };
   });
-  const shortlist = [...records.values()].slice(0, input.maxResults);
+  const ranked = rankCandidates([...records.values()], input);
+  const shortlist = ranked.slice(0, input.maxResults);
+  const repetitionNotes = [];
+  for (let i = 0; i < ranked.length; i++) {
+    const earlier = ranked.slice(0, i).find((other) => suspectedRepetition(ranked[i], other));
+    if (earlier) repetitionNotes.push(`Suspected repetitive titles: ${earlier.publicationNumber} and ${ranked[i].publicationNumber}. Family relationship and material differences are unverified; compare both records: ${earlier.sourceUrl} and ${ranked[i].sourceUrl}.`);
+  }
   let detailsFailed = 0;
   const patents = await Promise.all(shortlist.map(async (patent, index) => {
     if (index >= 3) return patent;
@@ -55,6 +62,9 @@ export async function research(input, provider) {
       'No matches means none were retrieved by these searches, not that the invention is novel or safe to build.',
       'Search snippets may be incomplete. Abstracts and claims are identified separately when available.',
       'Provider-reported legal status is not independently verified. Unpublished applications are not covered.',
+      'Shortlist ranked across all queries by feature keyword overlap in titles/snippets, with query diversity and a repeated-title penalty. This heuristic can miss relevant records; it is not a semantic or legal assessment.',
+      'AI reviews at most three shortlisted records and twelve relevance-selected passages per record, each at most 3000 characters. Available referenced parent claims are included when the passage budget allows; omitted or truncated context may matter.',
+      ...repetitionNotes,
     ],
   };
 }

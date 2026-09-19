@@ -1,5 +1,6 @@
 import { spawn } from 'node:child_process';
 import { ApiError } from '../errors.js';
+import { selectEvidence } from '../selection.js';
 
 const quoteShell = (value) => `'${value.replace(/'/g, `'\\''`)}'`;
 const invalidOutput = () => new ApiError(502, 'INVALID_AI_RESPONSE', 'Codex returned an invalid or unsupported response.');
@@ -125,13 +126,13 @@ export class CodexCliProvider {
   async compare(report) {
     const patents = report.patents.slice(0, 3).map((patent) => ({
       publicationNumber: patent.publicationNumber, title: patent.title,
-      evidence: patent.evidence.slice(0, 12).map((entry) => ({ ...entry, text: entry.text.slice(0, 3000) })),
+      evidence: selectEvidence(patent, report.input.features),
     }));
     const output = await this.invoke(
       'Compare the exact founder features against the supplied patent evidence. Every comparison needs 1–3 exact supporting quotes of 12–1000 characters and their evidence IDs from that same patent. Use relationship related or uncertain. Omit unsupported comparisons. Describe observations, not legal conclusions. The summary should only summarize supported comparisons. Return up to 12 comparisons and eight research questions. Also propose up to three alternative technical approaches to discuss with a patent professional. Each alternative must name an exact founder feature, explain tradeoffs, ask 1–3 questions for professional review, and cite evidence already used in a comparison to explain the motivation. Alternatives are hypotheses: never claim that a change avoids infringement, is novel, is unpatented, or is legally safe. An empty alternatives array is appropriate when no grounded proposal is possible.',
       { idea: report.input.idea, features: report.input.features, patents },
       '{"summary":"...","comparisons":[{"publicationNumber":"...","feature":"exact feature from input","relationship":"related or uncertain","explanation":"...","citations":[{"evidenceId":"...","quote":"exact source substring"}]}],"alternatives":[{"feature":"exact feature from input","approach":"...","tradeoffs":"...","questionsForProfessional":["..."],"citations":[{"evidenceId":"...","quote":"exact source substring"}]}],"questions":["..."]}');
     return { ...validateComparisons(output, patents, report.input.features),
-      coverage: 'First three records; up to twelve passages per record, each limited to 3000 characters.' };
+      coverage: 'First three relevance/diversity-ranked records; up to twelve feature-selected passages per record with available parent claims, each limited to 3000 characters. Context may be omitted or truncated.' };
   }
 }

@@ -3,54 +3,125 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Prior Art — see what's already patented before you build it</title>
+<title>Patrick — your AI invention research agent</title>
+<meta name="description" content="Patrick turns your invention into a structured investigation, finds relevant patent evidence, and prepares an evidence-backed brief for professional review.">
 <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
 
+<!-- Placeholder mascot. Swap this symbol's contents for the real Patrick
+     artwork; everything else references it through <use href="#patrick">. -->
+<svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="patrick" viewBox="0 0 64 64">
+    <rect x="12" y="16" width="40" height="36" rx="12" fill="currentColor"/>
+    <rect x="30" y="6" width="4" height="10" rx="2" fill="currentColor"/>
+    <circle cx="32" cy="5" r="4" fill="currentColor"/>
+    <circle cx="24" cy="32" r="6.5" fill="#fff"/>
+    <circle cx="42" cy="32" r="6.5" fill="#fff"/>
+    <circle cx="25.5" cy="33" r="3" fill="currentColor"/>
+    <circle cx="43.5" cy="33" r="3" fill="currentColor"/>
+    <rect x="26" y="43" width="12" height="3.5" rx="1.75" fill="#fff"/>
+  </symbol>
+</svg>
+
 <header class="masthead">
-  <p class="wordmark">Prior Art</p>
-  <p class="kicker">AINU Chatathon 2026 · Misneach</p>
+  <a class="wordmark" href="#top">
+    <svg class="mark" aria-hidden="true"><use href="#patrick"/></svg>
+    <span>Patrick</span>
+  </a>
+  <p class="kicker">Your AI invention research agent</p>
 </header>
 
-<main>
+<main id="top">
 
-  <!-- 1. the prompt box -->
+  <!-- 1. hero + the prompt box -->
   <section id="step-idea" class="hero">
-    <h1>See what's already patented<br>before you build it.</h1>
-    <p class="standfirst">
-      Describe your idea the way you'd explain it to a friend. Get back the actual
-      patent numbers sitting closest to it, the exact claim text that overlaps, and
-      a few honest directions worth exploring instead.
-    </p>
-
-    <form id="form-idea" class="ask">
-      <label for="idea">What are you building?</label>
-      <textarea id="idea" name="idea" rows="5" maxlength="5000" required
-        placeholder="A plant container that measures soil moisture and opens a valve to water the plant automatically."></textarea>
-      <div class="examples">
-        <span class="meta">Try one:</span>
-        <button type="button" class="link" data-example="A plant container that measures soil moisture with a capacitive sensor and opens a small valve to water the plant automatically.">self-watering planter</button>
-        <button type="button" class="link" data-example="A wrist-worn band that estimates blood oxygen from reflected green and red light and warns the wearer when readings drop overnight.">wearable sensor</button>
-        <button type="button" class="link" data-example="A bike lock that unlocks over Bluetooth and stiffens its shackle using a shape-memory alloy when it detects cutting vibration.">smart bike lock</button>
-      </div>
-      <button type="submit" id="plan-submit" class="button">Find what already exists</button>
-      <p class="fineprint">
-        Submitting sends your description through our hosting services (Vercel and
-        Cloudflare on the public demo) to a model provider to draft the search. Use a
-        fictional or non-confidential idea for this demo — a search query can itself
-        disclose an invention.
+    <div class="hero-copy">
+      <h1>Know what already exists<br>before you build.</h1>
+      <p class="standfirst">
+        Patrick turns your invention into a structured investigation, finds relevant
+        patent evidence, explains what it finds, and prepares the questions worth
+        bringing to counsel.
       </p>
-    </form>
+
+      <form id="form-idea" class="ask">
+        <label for="idea">Describe your invention</label>
+        <textarea id="idea" name="idea" rows="4" maxlength="5000" required
+          placeholder="An AI recycling bin that identifies waste with a camera and sorts it automatically."></textarea>
+        <div class="examples">
+          <span class="meta">Try one:</span>
+          <button type="button" class="link" data-example="A recycling bin that identifies waste with a camera, classifies the material on a local processor, and moves a flap to drop each item into the right compartment.">AI recycling bin</button>
+          <button type="button" class="link" data-example="A plant container that measures soil moisture with a capacitive sensor and opens a small valve to water the plant automatically.">self-watering planter</button>
+          <button type="button" class="link" data-example="A bike lock that unlocks over Bluetooth and stiffens its shackle using a shape-memory alloy when it detects cutting vibration.">smart bike lock</button>
+        </div>
+        <div class="cta-row">
+          <button type="submit" id="plan-submit" class="button">Investigate my invention</button>
+          <a class="button ghost" href="#how">See how Patrick works</a>
+        </div>
+        <p class="assurance">
+          <strong>Evidence, not legal conclusions.</strong> Patrick shows what it
+          found, what it searched, and what still needs professional review.
+        </p>
+        <p class="fineprint">
+          Submitting sends your description through our hosting services (Vercel and
+          Cloudflare on the public demo) to a model provider to draft the search. Use a
+          fictional or non-confidential idea for this demo — a search query can itself
+          disclose an invention.
+        </p>
+      </form>
+    </div>
+
+    <!-- Illustration of the pipeline, not output from a run. -->
+    <aside class="hero-visual" aria-label="Example of how Patrick works">
+      <p class="example-flag">Example</p>
+
+      <div class="flow-step">
+        <p class="flow-label">Your idea</p>
+        <p class="flow-quote">“An AI recycling bin that automatically sorts waste.”</p>
+      </div>
+
+      <p class="flow-arrow" aria-hidden="true">↓</p>
+
+      <div class="flow-step">
+        <p class="flow-label"><svg class="mark tiny" aria-hidden="true"><use href="#patrick"/></svg> Patrick understands it</p>
+        <p class="flow-sub">Technical mechanisms identified</p>
+        <ul class="pills">
+          <li>computer vision classification</li>
+          <li>sensor inputs</li>
+          <li>mechanical sorting</li>
+          <li>actuator control</li>
+          <li>local inference</li>
+        </ul>
+      </div>
+
+      <p class="flow-arrow" aria-hidden="true">↓</p>
+
+      <div class="flow-step">
+        <p class="flow-label"><svg class="mark tiny" aria-hidden="true"><use href="#patrick"/></svg> Patrick investigates it</p>
+        <ul class="ticks">
+          <li>Patent search</li>
+          <li>Relevant technical passages</li>
+          <li>Similar mechanisms</li>
+          <li>Professional review questions</li>
+        </ul>
+      </div>
+
+      <p class="flow-arrow" aria-hidden="true">↓</p>
+
+      <div class="flow-step flow-final">
+        <p class="flow-label">Evidence-backed brief</p>
+        <p class="flow-sub">Sourced, quoted, and ready for counsel.</p>
+      </div>
+    </aside>
   </section>
 
   <div id="error" class="error" role="alert" hidden></div>
 
   <!-- 2. confirm the search -->
   <section id="step-plan" hidden>
-    <h2>Check the search before it runs</h2>
+    <h2>Check the investigation before it runs</h2>
     <p class="lead">
-      This is what the search is about to look for. Edit anything that's wrong —
+      This is what Patrick is about to look for. Edit anything that's wrong —
       you know your invention better than the model does.
     </p>
     <blockquote id="plan-idea" class="restate"></blockquote>
@@ -72,7 +143,7 @@
       </fieldset>
 
       <div id="plan-questions" hidden>
-        <p class="label">The model wasn't sure about these</p>
+        <p class="label">Patrick wasn't sure about these</p>
         <ul id="plan-questions-list" class="bullets"></ul>
         <p class="meta">Answering these in your description usually sharpens the results.</p>
       </div>
@@ -114,7 +185,7 @@
       </label>
 
       <div class="row">
-        <button type="submit" id="plan-submit-run" class="button" disabled>Run the search</button>
+        <button type="submit" id="plan-submit-run" class="button" disabled>Run the investigation</button>
         <button type="button" id="plan-back" class="button ghost">Start over</button>
       </div>
     </form>
@@ -131,75 +202,185 @@
   <!-- 4. the report -->
   <section id="step-report" hidden>
     <div id="report"></div>
-    <button type="button" id="report-restart" class="button ghost">Research another idea</button>
+    <button type="button" id="report-restart" class="button ghost">Investigate another idea</button>
   </section>
 
-  <!-- the pitch -->
-  <section class="pitch">
-    <div class="pitch-item">
-      <p class="label">Who it's for</p>
-      <h3>The first-time product founder.</h3>
-      <p>
-        You're building something physical or technical. There's no research
-        specialist on the team, no patent budget yet, and a real chance that some
-        part of your idea is already sitting in a filing cabinet in Alexandria,
-        Virginia. You have no practical way to find out.
+  <!-- ===== marketing: hidden once the founder is past the prompt ===== -->
+
+  <!-- 2. search starts with understanding -->
+  <section class="marketing band">
+    <div class="section-head">
+      <h2>Better research starts with a better description.</h2>
+      <p class="lead">
+        Founders naturally explain what an invention does. Patent records describe
+        how inventions work. Patrick asks the questions needed to turn a vague idea
+        into a structured technical description before searching.
       </p>
     </div>
 
-    <div class="pitch-item">
-      <p class="label">The bottleneck</p>
-      <h3>Turning a description into a shortlist.</h3>
-      <p>
-        Patent search punishes newcomers. The records are indexed by classification
-        codes you've never seen, described in vocabulary chosen by attorneys to be
-        broad rather than clear, and split between granted patents and pending
-        applications that mean very different things. So founders do one of two
-        things: skip the search and build blind, or stall for weeks reading
-        documents they can't interpret.
+    <div class="translate">
+      <div class="translate-col">
+        <p class="label">Founder says</p>
+        <p class="flow-quote">“I built an AI-powered recycling bin.”</p>
+      </div>
+      <div class="translate-col">
+        <p class="label"><svg class="mark tiny" aria-hidden="true"><use href="#patrick"/></svg> Patrick asks</p>
+        <ul class="bullets">
+          <li>How is the material identified?</li>
+          <li>What sensors are involved?</li>
+          <li>How is waste physically redirected?</li>
+          <li>Where does inference happen?</li>
+        </ul>
+      </div>
+      <div class="translate-col">
+        <p class="label"><svg class="mark tiny" aria-hidden="true"><use href="#patrick"/></svg> Patrick searches</p>
+        <ul class="pills stack">
+          <li>vision-based material classification</li>
+          <li>electromechanical sorting systems</li>
+          <li>sensor-controlled waste routing</li>
+          <li>automated refuse classification</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. what Patrick does today -->
+  <section id="how" class="marketing">
+    <div class="section-head">
+      <h2>From idea to evidence-backed research brief.</h2>
+      <p class="lead">What Patrick does today, in the order it does it.</p>
+    </div>
+
+    <ol class="cards">
+      <li class="card">
+        <p class="step-number">01</p>
+        <h3>Understand the invention</h3>
+        <p>Patrick interviews the founder and extracts the mechanisms that actually matter.</p>
+      </li>
+      <li class="card">
+        <p class="step-number">02</p>
+        <h3>Build the search plan</h3>
+        <p>Patrick creates technical features, search concepts, and queries that the founder can review.</p>
+      </li>
+      <li class="card">
+        <p class="step-number">03</p>
+        <h3>Investigate the evidence</h3>
+        <p>Patrick retrieves relevant patent records and identifies exact passages connected to the invention.</p>
+      </li>
+      <li class="card">
+        <p class="step-number">04</p>
+        <h3>Prepare the handoff</h3>
+        <p>Patrick produces a structured brief with comparisons, sources, alternatives, and questions for professional review.</p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- 4. the output -->
+  <section class="marketing band">
+    <div class="section-head">
+      <h2>Not a list of links. A research dossier.</h2>
+      <p class="lead">
+        Every run ends in a document you can hand to a professional, exportable as
+        Markdown, LaTeX, or a typeset PDF.
       </p>
     </div>
 
-    <div class="pitch-item">
-      <p class="label">What you get</p>
-      <h3>Evidence, not opinions.</h3>
-      <p>
-        Publication numbers you can look up yourself. The exact sentences from each
-        patent that touch your idea, quoted rather than paraphrased. Alternative
-        technical routes prompted by what those patents actually claim. And a list
-        of questions written against your specifics, ready for a professional.
+    <!-- Structure of the report, not output from a run. -->
+    <div class="dossier">
+      <p class="example-flag">Example structure</p>
+      <dl>
+        <div><dt>Invention summary</dt><dd>Structured technical description.</dd></div>
+        <div><dt>Search strategy</dt><dd>What Patrick searched and why.</dd></div>
+        <div><dt>Relevant patents</dt><dd>Patent family, assignee, dates, cited passages.</dd></div>
+        <div><dt>Feature comparison</dt><dd>Which mechanisms appear similar and where.</dd></div>
+        <div><dt>Alternative approaches</dt><dd>Potential technical directions worth evaluating.</dd></div>
+        <div><dt>Questions for counsel</dt><dd>Specific issues that deserve professional review.</dd></div>
+        <div><dt>Coverage</dt><dd>What Patrick searched, what it did not search, and important limitations.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 5. the bigger vision -->
+  <section class="marketing">
+    <div class="section-head">
+      <h2>Patents are the first layer.</h2>
+      <p class="lead">
+        Patrick begins with patent research because patent data is structured,
+        public, and searchable. The same research architecture can extend into the
+        broader invention landscape.
       </p>
     </div>
 
-    <div class="pitch-item">
-      <p class="label">The savings</p>
-      <h3>Minutes instead of an afternoon.</h3>
-      <p>
-        A run finishes in under three minutes. Assembling the same sourced shortlist
-        by hand is an afternoon at best and a week at worst, and most founders never
-        finish it. The bigger prize is the first attorney meeting: walk in with
-        numbered records and specific questions and that hour goes to answers
-        instead of orientation. We measure time-to-brief, source accuracy, and
-        search cost. Legal-fee savings are the hypothesis we're testing, not a
-        number we're claiming.
-      </p>
+    <ul class="layers">
+      <li><span class="layer-name">Patents</span><span class="layer-q">What has been claimed?</span><span class="tag tag-live">Built</span></li>
+      <li><span class="layer-name">Products</span><span class="layer-q">What has already reached the market?</span><span class="tag">Planned</span></li>
+      <li><span class="layer-name">Companies</span><span class="layer-q">Who is working on similar technology?</span><span class="tag">Planned</span></li>
+      <li><span class="layer-name">Technical literature</span><span class="layer-q">What has already been demonstrated?</span><span class="tag">Planned</span></li>
+      <li><span class="layer-name">Regulatory signals</span><span class="layer-q">What public requirements may matter?</span><span class="tag">Planned</span></li>
+    </ul>
+
+    <p class="closing-line">
+      The goal is one evidence-backed view of what surrounds an invention before a
+      founder commits serious time and capital.
+    </p>
+  </section>
+
+  <!-- 6. positioning -->
+  <section class="marketing band">
+    <div class="section-head">
+      <h2>Patrick fills the gap between search and legal judgment.</h2>
     </div>
 
-    <div class="pitch-item wide">
-      <p class="label">Why it holds up</p>
-      <h3>It refuses to tell you what it can't know.</h3>
-      <p>
-        Every comparison has to quote the patent word for word, and the quote is
-        checked character by character against the retrieved record before it
-        reaches you — a model can't invent a patent number or a claim here and have
-        it survive. Coverage limits are printed on the report rather than buried.
-        And the tool will not tell you that something is novel, patentable,
-        non-infringing, or safe to build, because a search cannot establish any of
-        those things. Empty results mean these keywords found nothing. Nothing more.
-        The judgment stays with a registered patent attorney; this gets you to that
-        conversation prepared.
-      </p>
+    <table class="positioning">
+      <caption class="visually-hidden">What each tool does</caption>
+      <thead>
+        <tr><th scope="col">Tool</th><th scope="col">What it does</th></tr>
+      </thead>
+      <tbody>
+        <tr><th scope="row">Google</th><td>Finds webpages</td></tr>
+        <tr><th scope="row">Patent databases</th><td>Find patent records</td></tr>
+        <tr class="is-patrick"><th scope="row">Patrick</th><td>Investigates the invention and connects the evidence</td></tr>
+        <tr><th scope="row">Attorney</th><td>Provides professional legal judgment</td></tr>
+      </tbody>
+    </table>
+
+    <p class="closing-line">
+      Patrick does not replace counsel. It makes the founder better prepared for counsel.
+    </p>
+  </section>
+
+  <!-- 7. trust -->
+  <section class="marketing">
+    <div class="section-head">
+      <h2>Patrick shows its work.</h2>
     </div>
+
+    <div class="trust">
+      <div>
+        <h3>Evidence-linked</h3>
+        <p>Important findings point back to the source material.</p>
+      </div>
+      <div>
+        <h3>Search trace</h3>
+        <p>See what Patrick searched and how your original description was reformulated.</p>
+      </div>
+      <div>
+        <h3>Explicit coverage</h3>
+        <p>Patrick distinguishes between what it found and what it could not verify.</p>
+      </div>
+    </div>
+
+    <p class="closing-line">
+      No result means “no evidence found in the sources searched,” not “nothing exists.”
+    </p>
+  </section>
+
+  <!-- final CTA -->
+  <section class="marketing final-cta">
+    <svg class="mark large" aria-hidden="true"><use href="#patrick"/></svg>
+    <h2>Before you spend months building, investigate what already exists.</h2>
+    <a class="button" href="#top">Start with Patrick</a>
+    <p class="meta">Turn your idea into a structured investigation and an evidence-backed brief.</p>
   </section>
 </main>
 
@@ -208,6 +389,7 @@
     Research assistance only. Not legal advice, and not a patentability, novelty,
     infringement, or freedom-to-operate opinion.
   </p>
+  <p class="kicker">AINU Chatathon 2026 · Misneach</p>
 </footer>
 
 <script type="module" src="./src/app.js"></script>

@@ -137,10 +137,73 @@ test('export preserves evidence and escapes untrusted document content', async (
   const report = await research({ ...input, idea: '<script>alert(1)</script> [click](javascript:alert(1))' }, stubProvider());
   const markdown = toMarkdown(report);
   assert.ok(markdown.includes('US12345678B2:snippet'));
-  assert.ok(markdown.includes('Test-only moisture sensing passage'.replace('-', '\\-')));
+  // Ordinary punctuation stays readable; only link and emphasis syntax is escaped.
+  assert.ok(markdown.includes('Test-only moisture sensing passage.'));
   assert.ok(!markdown.includes('<script>'));
   assert.ok(!markdown.includes('[click]('));
   assert.ok(markdown.includes('not connected yet'));
+});
+
+test('export leads with conclusions and keeps source passages in the appendix', async () => {
+  const report = await research(input, stubProvider());
+  const markdown = toMarkdown(report);
+  const features = markdown.indexOf('## Where your features stand');
+  const records = markdown.indexOf('## Records retrieved');
+  const appendixAt = markdown.indexOf('## Appendix: source passages');
+  assert.ok(features > 0 && records > 0 && appendixAt > 0);
+  assert.ok(features < records, 'feature table must precede the record list');
+  assert.ok(records < appendixAt, 'full source passages must come last');
+});
+
+test('export reports uncompared founder features as a research gap, not as clearance', async () => {
+  const report = await research(input, stubProvider());
+  // The stub has no AI analysis, so neither supplied feature is compared.
+  const markdown = toMarkdown(report);
+  for (const feature of input.features) {
+    assert.ok(markdown.includes(feature), `feature missing from export: ${feature}`);
+  }
+  assert.ok(markdown.includes('Not established in reviewed evidence'));
+  assert.ok(markdown.includes('not evidence that no patent covers them'));
+  // Disclaimers legitimately use these words ("not that the invention is novel"),
+  // so scan only lines that are not themselves negations.
+  const affirmative = markdown.split('\n').filter((line) => !/\bnot\b/i.test(line));
+  for (const claim of [/\bpatentable\b/i, /\bis novel\b/i, /\b(?:cleared|safe) to build\b/i,
+    /\bfreedom to operate\b/i, /\bdoes not infringe\b/i]) {
+    const hit = affirmative.find((line) => claim.test(line));
+    assert.equal(hit, undefined, `export must not assert ${claim} in: ${hit}`);
+  }
+});
+
+test('export distinguishes records by how much of each was actually reviewed', async () => {
+  const provider = stubProvider();
+  const report = await research(input, {
+    ...provider,
+    details: async () => { throw new ApiError(502, 'DETAILS_FAILED', 'unavailable'); },
+  });
+  const markdown = toMarkdown(report);
+  assert.ok(markdown.includes('Full text could not be retrieved; snippet only'));
+});
+
+test('export escapes block markers without corrupting numbered claim text', () => {
+  const report = {
+    createdAt: 'now', status: 'completed', provider: 'test_only',
+    input: { idea: 'idea', features: ['f'] },
+    searches: [], warnings: [], limitations: [],
+    coverage: { publicationAuthority: 'US', uniquePublicationsRetrieved: 1, returnedPublications: 1, detailsRequested: 1 },
+    patents: [{
+      publicationNumber: 'US12345678B2', title: 'Test-only record', sourceUrl: 'https://example.invalid/x',
+      assignees: [], publicationDate: null, filingDate: null, priorityDate: null, grantDate: null,
+      documentType: 'granted_patent', legalStatus: { value: null, verified: false },
+      retrievedAt: 'now', detailsStatus: 'available', matchedQueries: ['q'],
+      evidence: [{ id: 'US12345678B2:claim:8', section: 'claim', text: '8. A test-only claim.\n# not a heading' }],
+    }],
+    analysis: { status: 'not_requested', comparisons: [], message: 'no analysis' },
+  };
+  const markdown = toMarkdown(report);
+  // A digit cannot carry a Markdown escape, so the period is escaped instead.
+  assert.ok(markdown.includes('8\\. A test-only claim.'));
+  assert.ok(!/\\[0-9]/.test(markdown));
+  assert.ok(markdown.includes('\\# not a heading'));
 });
 
 test('HTTP contract: health, validation, research, retrieval, export, origin restrictions', async (t) => {

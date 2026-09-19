@@ -15,6 +15,7 @@ const assetRoot = new URL('../../frontend/', import.meta.url);
 const assets = new Map([
   ['/', ['index.html', 'text/html']], ['/index.html', ['index.html', 'text/html']],
   ['/styles.css', ['styles.css', 'text/css']], ['/login.html', ['login.html', 'text/html']],
+  ['/patrick.svg', ['patrick.svg', 'image/svg+xml']],
   ...['api', 'app', 'render', 'login'].map((name) => [`/src/${name}.js`, [`src/${name}.js`, 'text/javascript']]),
 ]);
 
@@ -84,7 +85,9 @@ export function createGateway({ access, provider, ai, publicOrigin = '', proxyKe
         res.setHeader('Set-Cookie', sessionCookie(secret, 8 * 3600));
         send(200, { status: 'authenticated' }); return;
       }
-      const publicAsset = ['/login.html', '/src/login.js', '/styles.css'].includes(path);
+      // The sign-in page renders before authentication, so its assets — the
+      // stylesheet and the logo it carries — stay reachable without a session.
+      const publicAsset = ['/login.html', '/src/login.js', '/styles.css', '/patrick.svg'].includes(path);
       if (!user && !publicAsset) {
         if (req.method === 'GET' && ['/', '/index.html'].includes(path)) {
           res.writeHead(302, { Location: '/login.html' }); res.end(); return;

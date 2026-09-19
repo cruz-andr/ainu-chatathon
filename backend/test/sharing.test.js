@@ -225,3 +225,13 @@ test('PDF requests are throttled well below the general budget and report an abs
   assert.equal(throttled.status, 429);
   assert.equal((await throttled.json()).error.code, 'RATE_LIMIT');
 });
+
+test('the logo is served without a session, because the sign-in page carries it', async (t) => {
+  const { request } = await setup(t);
+  const logo = await request('/patrick.svg');
+  assert.equal(logo.status, 200);
+  assert.match(logo.headers.get('content-type'), /^image\/svg\+xml/);
+  assert.match(await logo.text(), /^<svg /);
+  // Anything not on the public list still needs one.
+  assert.equal((await request('/src/app.js')).status, 401);
+});

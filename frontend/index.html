@@ -5,28 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Patrick — your AI invention research agent</title>
 <meta name="description" content="Patrick turns your invention into a structured investigation, finds relevant patent evidence, and prepares an evidence-backed brief for professional review.">
+<link rel="icon" href="./patrick.svg" type="image/svg+xml">
 <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
 
-<!-- Placeholder mascot. Swap this symbol's contents for the real Patrick
-     artwork; everything else references it through <use href="#patrick">. -->
-<svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
-  <symbol id="patrick" viewBox="0 0 64 64">
-    <rect x="12" y="16" width="40" height="36" rx="12" fill="currentColor"/>
-    <rect x="30" y="6" width="4" height="10" rx="2" fill="currentColor"/>
-    <circle cx="32" cy="5" r="4" fill="currentColor"/>
-    <circle cx="24" cy="32" r="6.5" fill="#fff"/>
-    <circle cx="42" cy="32" r="6.5" fill="#fff"/>
-    <circle cx="25.5" cy="33" r="3" fill="currentColor"/>
-    <circle cx="43.5" cy="33" r="3" fill="currentColor"/>
-    <rect x="26" y="43" width="12" height="3.5" rx="1.75" fill="#fff"/>
-  </symbol>
-</svg>
-
 <header class="masthead">
   <a class="wordmark" href="#top">
-    <svg class="mark" aria-hidden="true"><use href="#patrick"/></svg>
+    <img class="mark" src="./patrick.svg" alt="" width="388" height="532">
     <span>Patrick</span>
   </a>
   <p class="kicker">Your AI invention research agent</p>
@@ -34,85 +20,39 @@
 
 <main id="top">
 
-  <!-- 1. hero + the prompt box -->
+  <!-- 1. hero: one idea, one action -->
   <section id="step-idea" class="hero">
-    <div class="hero-copy">
-      <h1>Know what already exists<br>before you build.</h1>
-      <p class="standfirst">
-        Patrick turns your invention into a structured investigation, finds relevant
-        patent evidence, explains what it finds, and prepares the questions worth
-        bringing to counsel.
+    <img class="mark hero-mark" src="./patrick.svg" alt="Patrick" width="388" height="532">
+    <h1>Know what already exists<br>before you build.</h1>
+    <p class="standfirst">
+      Patrick turns your invention into a structured investigation, finds relevant
+      patent evidence, and prepares an evidence-backed brief for professional review.
+    </p>
+
+    <form id="form-idea" class="ask">
+      <label for="idea">Describe your invention</label>
+      <textarea id="idea" name="idea" rows="3" maxlength="5000" required
+        placeholder="An AI recycling bin that identifies waste with a camera and sorts it automatically."></textarea>
+      <div class="cta-row">
+        <button type="submit" id="plan-submit" class="button">Investigate my invention</button>
+        <a class="button ghost" href="#how">See how Patrick works</a>
+      </div>
+      <p class="assurance">
+        <strong>Evidence, not legal conclusions.</strong> Patrick shows what it
+        found, what it searched, and what still needs professional review.
       </p>
-
-      <form id="form-idea" class="ask">
-        <label for="idea">Describe your invention</label>
-        <textarea id="idea" name="idea" rows="4" maxlength="5000" required
-          placeholder="An AI recycling bin that identifies waste with a camera and sorts it automatically."></textarea>
-        <div class="examples">
-          <span class="meta">Try one:</span>
-          <button type="button" class="link" data-example="A recycling bin that identifies waste with a camera, classifies the material on a local processor, and moves a flap to drop each item into the right compartment.">AI recycling bin</button>
-          <button type="button" class="link" data-example="A plant container that measures soil moisture with a capacitive sensor and opens a small valve to water the plant automatically.">self-watering planter</button>
-          <button type="button" class="link" data-example="A bike lock that unlocks over Bluetooth and stiffens its shackle using a shape-memory alloy when it detects cutting vibration.">smart bike lock</button>
-        </div>
-        <div class="cta-row">
-          <button type="submit" id="plan-submit" class="button">Investigate my invention</button>
-          <a class="button ghost" href="#how">See how Patrick works</a>
-        </div>
-        <p class="assurance">
-          <strong>Evidence, not legal conclusions.</strong> Patrick shows what it
-          found, what it searched, and what still needs professional review.
-        </p>
-        <p class="fineprint">
-          Submitting sends your description through our hosting services (Vercel and
-          Cloudflare on the public demo) to a model provider to draft the search. Use a
-          fictional or non-confidential idea for this demo — a search query can itself
-          disclose an invention.
-        </p>
-      </form>
-    </div>
-
-    <!-- Illustration of the pipeline, not output from a run. -->
-    <aside class="hero-visual" aria-label="Example of how Patrick works">
-      <p class="example-flag">Example</p>
-
-      <div class="flow-step">
-        <p class="flow-label">Your idea</p>
-        <p class="flow-quote">“An AI recycling bin that automatically sorts waste.”</p>
+      <div class="examples">
+        <span class="meta">Try one:</span>
+        <button type="button" class="link" data-example="A recycling bin that identifies waste with a camera, classifies the material on a local processor, and moves a flap to drop each item into the right compartment.">AI recycling bin</button>
+        <button type="button" class="link" data-example="A plant container that measures soil moisture with a capacitive sensor and opens a small valve to water the plant automatically.">self-watering planter</button>
+        <button type="button" class="link" data-example="A bike lock that unlocks over Bluetooth and stiffens its shackle using a shape-memory alloy when it detects cutting vibration.">smart bike lock</button>
       </div>
-
-      <p class="flow-arrow" aria-hidden="true">↓</p>
-
-      <div class="flow-step">
-        <p class="flow-label"><svg class="mark tiny" aria-hidden="true"><use href="#patrick"/></svg> Patrick understands it</p>
-        <p class="flow-sub">Technical mechanisms identified</p>
-        <ul class="pills">
-          <li>computer vision classification</li>
-          <li>sensor inputs</li>
-          <li>mechanical sorting</li>
-          <li>actuator control</li>
-          <li>local inference</li>
-        </ul>
-      </div>
-
-      <p class="flow-arrow" aria-hidden="true">↓</p>
-
-      <div class="flow-step">
-        <p class="flow-label"><svg class="mark tiny" aria-hidden="true"><use href="#patrick"/></svg> Patrick investigates it</p>
-        <ul class="ticks">
-          <li>Patent search</li>
-          <li>Relevant technical passages</li>
-          <li>Similar mechanisms</li>
-          <li>Professional review questions</li>
-        </ul>
-      </div>
-
-      <p class="flow-arrow" aria-hidden="true">↓</p>
-
-      <div class="flow-step flow-final">
-        <p class="flow-label">Evidence-backed brief</p>
-        <p class="flow-sub">Sourced, quoted, and ready for counsel.</p>
-      </div>
-    </aside>
+      <p class="fineprint">
+        Demo: use a fictional or non-confidential idea — a search query can itself
+        disclose an invention. Your description is sent to a model provider through
+        our hosting services to draft the search.
+      </p>
+    </form>
   </section>
 
   <div id="error" class="error" role="alert" hidden></div>
@@ -207,8 +147,56 @@
 
   <!-- ===== marketing: hidden once the founder is past the prompt ===== -->
 
-  <!-- 2. search starts with understanding -->
-  <section class="marketing band">
+  <!-- how it works, in one glance -->
+  <section id="how" class="marketing band">
+    <div class="section-head">
+      <h2>One sentence in. A sourced brief out.</h2>
+      <p class="lead">An illustration of the pipeline, not output from a run.</p>
+    </div>
+
+    <div class="flow">
+      <div class="flow-step">
+        <p class="flow-label">Your idea</p>
+        <p class="flow-quote">“An AI recycling bin that automatically sorts waste.”</p>
+      </div>
+
+      <p class="flow-arrow" aria-hidden="true">→</p>
+
+      <div class="flow-step">
+        <p class="flow-label"><img class="mark tiny" src="./patrick.svg" alt="" width="388" height="532"> Patrick understands it</p>
+        <p class="flow-sub">Technical mechanisms identified</p>
+        <ul class="pills">
+          <li>computer vision classification</li>
+          <li>sensor inputs</li>
+          <li>mechanical sorting</li>
+          <li>actuator control</li>
+          <li>local inference</li>
+        </ul>
+      </div>
+
+      <p class="flow-arrow" aria-hidden="true">→</p>
+
+      <div class="flow-step">
+        <p class="flow-label"><img class="mark tiny" src="./patrick.svg" alt="" width="388" height="532"> Patrick investigates it</p>
+        <ul class="ticks">
+          <li>Patent search</li>
+          <li>Relevant technical passages</li>
+          <li>Similar mechanisms</li>
+          <li>Professional review questions</li>
+        </ul>
+      </div>
+
+      <p class="flow-arrow" aria-hidden="true">→</p>
+
+      <div class="flow-step flow-final">
+        <p class="flow-label">Evidence-backed brief</p>
+        <p class="flow-sub">Sourced, quoted, and ready for counsel.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- search starts with understanding -->
+  <section class="marketing">
     <div class="section-head">
       <h2>Better research starts with a better description.</h2>
       <p class="lead">
@@ -224,7 +212,7 @@
         <p class="flow-quote">“I built an AI-powered recycling bin.”</p>
       </div>
       <div class="translate-col">
-        <p class="label"><svg class="mark tiny" aria-hidden="true"><use href="#patrick"/></svg> Patrick asks</p>
+        <p class="label"><img class="mark tiny" src="./patrick.svg" alt="" width="388" height="532"> Patrick asks</p>
         <ul class="bullets">
           <li>How is the material identified?</li>
           <li>What sensors are involved?</li>
@@ -233,7 +221,7 @@
         </ul>
       </div>
       <div class="translate-col">
-        <p class="label"><svg class="mark tiny" aria-hidden="true"><use href="#patrick"/></svg> Patrick searches</p>
+        <p class="label"><img class="mark tiny" src="./patrick.svg" alt="" width="388" height="532"> Patrick searches</p>
         <ul class="pills stack">
           <li>vision-based material classification</li>
           <li>electromechanical sorting systems</li>
@@ -244,8 +232,8 @@
     </div>
   </section>
 
-  <!-- 3. what Patrick does today -->
-  <section id="how" class="marketing">
+  <!-- what Patrick does today -->
+  <section class="marketing band">
     <div class="section-head">
       <h2>From idea to evidence-backed research brief.</h2>
       <p class="lead">What Patrick does today, in the order it does it.</p>
@@ -275,8 +263,8 @@
     </ol>
   </section>
 
-  <!-- 4. the output -->
-  <section class="marketing band">
+  <!-- the output -->
+  <section class="marketing">
     <div class="section-head">
       <h2>Not a list of links. A research dossier.</h2>
       <p class="lead">
@@ -300,8 +288,8 @@
     </div>
   </section>
 
-  <!-- 5. the bigger vision -->
-  <section class="marketing">
+  <!-- the bigger vision -->
+  <section class="marketing band">
     <div class="section-head">
       <h2>Patents are the first layer.</h2>
       <p class="lead">
@@ -325,8 +313,8 @@
     </p>
   </section>
 
-  <!-- 6. positioning -->
-  <section class="marketing band">
+  <!-- positioning -->
+  <section class="marketing">
     <div class="section-head">
       <h2>Patrick fills the gap between search and legal judgment.</h2>
     </div>
@@ -349,8 +337,8 @@
     </p>
   </section>
 
-  <!-- 7. trust -->
-  <section class="marketing">
+  <!-- trust -->
+  <section class="marketing band">
     <div class="section-head">
       <h2>Patrick shows its work.</h2>
     </div>
@@ -377,7 +365,7 @@
 
   <!-- final CTA -->
   <section class="marketing final-cta">
-    <svg class="mark large" aria-hidden="true"><use href="#patrick"/></svg>
+    <img class="mark large" src="./patrick.svg" alt="" width="388" height="532">
     <h2>Before you spend months building, investigate what already exists.</h2>
     <a class="button" href="#top">Start with Patrick</a>
     <p class="meta">Turn your idea into a structured investigation and an evidence-backed brief.</p>

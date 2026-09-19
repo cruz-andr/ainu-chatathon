@@ -3,7 +3,7 @@ import { resolve, join } from 'node:path';
 
 // Build Output API v3: copy only explicitly public files, never the whole repo.
 const root = resolve('.vercel/output');
-const publicFiles = ['index.html', 'styles.css', 'src/api.js', 'src/app.js', 'src/render.js'];
+const publicFiles = ['index.html', 'styles.css', 'patrick.svg', 'src/api.js', 'src/app.js', 'src/render.js'];
 const functionFiles = ['api/index.js', 'backend/public-proxy.js'];
 const expected = new Set(['config.json', ...publicFiles.map((p) => `static/${p}`),
   'functions/api.func/package.json', 'functions/api.func/.vc-config.json',
@@ -34,4 +34,4 @@ await emit('config.json', { version: 3, routes: [
   { src: '/api(?:/.*)?', dest: '/api' },
   { handle: 'filesystem' },
 ] });
-console.log('Vercel build ready: five public assets and one private API function. No secrets or fixture reports included.');
+console.log('Vercel build ready: the public assets and one private API function. No secrets or fixture reports included.');

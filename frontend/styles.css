@@ -11,8 +11,8 @@
   --claimed: #1e4adf;
   --explore: #0f766e;
   --warn: #b45309;
-  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
-  --sans: ui-sans-serif, -apple-system, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+  --serif: Charter, "Bitstream Charter", "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+  --sans: "Avenir Next", Avenir, "Segoe UI Variable Text", "Segoe UI", ui-sans-serif, Helvetica, sans-serif;
   --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
   --page: 64rem;
   --text: 42rem;
@@ -37,15 +37,16 @@ h3 { font-size: 1.16rem; margin: 0 0 0.5rem; }
 p { margin: 0 0 1rem; }
 blockquote { margin: 0 0 0.75rem; }
 
-.sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
 .visually-hidden {
   position: absolute; width: 1px; height: 1px;
   clip-path: inset(50%); overflow: hidden; white-space: nowrap;
 }
 
-.mark { width: 2rem; height: 2rem; color: var(--blue); flex: none; }
-.mark.tiny { width: 1.05rem; height: 1.05rem; vertical-align: -0.15em; }
-.mark.large { width: 4.5rem; height: 4.5rem; }
+/* One asset at every size; the mark keeps its own proportions. */
+.mark { height: 1.9rem; width: auto; flex: none; }
+.mark.tiny { height: 1rem; vertical-align: -0.12em; }
+.mark.large { height: 4rem; }
+.hero-mark { height: 6.5rem; margin-bottom: 1.75rem; }
 
 /* masthead */
 .masthead {
@@ -61,12 +62,23 @@ blockquote { margin: 0 0 0.75rem; }
 .kicker { margin: 0; font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
 
 /* hero */
-.hero {
-  display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-  gap: 3.5rem; align-items: start; padding-bottom: 2rem;
-}
-.hero-copy { min-width: 0; }
-.standfirst { font-size: 1.16rem; color: var(--muted); max-width: var(--text); margin-bottom: 2.25rem; }
+.hero { max-width: 44rem; margin: 0 auto; padding: 2rem 0 4rem; text-align: center; }
+.hero h1 { margin-bottom: 1.5rem; }
+.standfirst { font-size: 1.18rem; color: var(--muted); margin: 0 auto 2.5rem; max-width: 36rem; }
+.hero .ask label { text-align: left; }
+.hero .cta-row, .hero .examples { justify-content: center; }
+.hero .assurance { margin-left: auto; margin-right: auto; text-align: left; }
+.hero .fineprint { margin-left: auto; margin-right: auto; text-align: center; max-width: 34rem; }
+
+/* One orchestrated entrance, then the page stays still. */
+@keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+.hero > *, .hero .ask > * { animation: rise 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) backwards; }
+.hero > *:nth-child(1) { animation-delay: 0.02s; }
+.hero > *:nth-child(2) { animation-delay: 0.1s; }
+.hero > *:nth-child(3) { animation-delay: 0.18s; }
+.hero > *:nth-child(4) { animation-delay: 0.26s; }
+.hero .ask > *:nth-child(n+3) { animation-delay: 0.34s; }
+@media (prefers-reduced-motion: reduce) { .hero > *, .hero .ask > * { animation: none; } }
 .lead { color: var(--muted); max-width: var(--text); }
 .label {
   display: flex; align-items: center; gap: 0.4rem;
@@ -102,22 +114,24 @@ textarea:focus, input:focus, select:focus { outline: 2px solid var(--blue); outl
 .cta-row { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
 
 .button {
-  display: inline-block; padding: 0.72rem 1.4rem; cursor: pointer;
+  display: inline-block; padding: 0.72rem 1.4rem;
+  transition: background-color 0.18s ease, transform 0.18s ease; cursor: pointer;
   font: inherit; font-weight: 500; text-decoration: none;
   color: #fff; background: var(--blue);
   border: 1px solid var(--blue); border-radius: 8px;
 }
-.button:hover { background: var(--blue-deep); border-color: var(--blue-deep); }
+.button:hover { background: var(--blue-deep); border-color: var(--blue-deep); transform: translateY(-1px); }
 .button:disabled { opacity: 0.4; cursor: not-allowed; }
 .button.ghost { color: var(--blue); background: none; }
 .button.ghost:hover { background: var(--soft); border-color: var(--blue); }
 .button.small { padding: 0.45rem 0.85rem; font-size: 0.88rem; }
 
-/* hero visual: an illustration of the flow, labelled as an example */
-.hero-visual {
-  background: var(--soft); border: 1px solid var(--rule); border-radius: 14px;
-  padding: 1.5rem; min-width: 0;
+/* the pipeline illustration, below the fold */
+.flow {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)) ;
+  gap: 0.75rem; align-items: stretch;
 }
+.flow .flow-arrow { display: none; }
 .example-flag {
   display: inline-block; margin: 0 0 1rem;
   font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase;
@@ -133,6 +147,7 @@ textarea:focus, input:focus, select:focus { outline: 2px solid var(--blue); outl
 .flow-quote { font-family: var(--serif); font-size: 1.02rem; margin: 0; }
 .flow-sub { font-size: 0.88rem; color: var(--muted); margin: 0 0 0.6rem; }
 .flow-arrow { text-align: center; color: var(--blue); font-size: 1.1rem; margin: 0.5rem 0; }
+.flow .flow-step { display: flex; flex-direction: column; }
 .flow-final { border-color: var(--blue); border-width: 2px; }
 .flow-final .flow-label { color: var(--blue); }
 .flow-final .flow-sub { margin: 0; }
@@ -370,7 +385,8 @@ footer {
 footer p { font-size: 0.82rem; color: var(--muted); margin: 0; max-width: 34rem; }
 
 @media (max-width: 62rem) {
-  .hero { grid-template-columns: 1fr; gap: 2.5rem; }
+  .flow { grid-template-columns: 1fr; }
+  .flow .flow-arrow { display: block; }
   .marketing.band { padding: 2rem 1.5rem; border-radius: 14px; }
   .dossier dl > div, .layers li { grid-template-columns: 1fr; }
   .layers li { gap: 0.25rem; }
